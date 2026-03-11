@@ -181,10 +181,14 @@ Keep language formal, concise, and audit-ready. Do not repeat the raw numbers ve
 
 
 def _call_gemini(prompt: str, api_key: str) -> str:
-    import google.generativeai as genai
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-1.5-flash")
-    response = model.generate_content(prompt)
+    from google import genai
+    from google.genai import types as genai_types
+    client = genai.Client(api_key=api_key)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=prompt,
+        config=genai_types.GenerateContentConfig(temperature=0.3),
+    )
     return response.text.strip()
 
 

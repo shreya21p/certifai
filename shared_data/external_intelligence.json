@@ -1,14 +1,16 @@
 {
-  "_comment": "Sample external_intelligence.json — produced by the Research Agent module.",
   "company_name": "Arjun Textiles Pvt. Ltd.",
-
-  "sector_risk_flag":    false,
-  "adverse_news_score":  0.15,
-  "management_risk_flag": false,
-
-  "sector":              "Textiles & Apparel",
-  "gstin_active":        true,
-  "mca_compliant":       true,
-  "court_cases_pending": 0,
-  "news_summary":        "Minor supply-chain disruption reported in Q3; no adverse findings."
+  "sector": "Textiles",
+  "risk_dimensions": {
+    "news_risk": "Medium",
+    "legal_risk": "Medium",
+    "sector_risk": "Medium",
+    "operational_risk": "Medium"
+  },
+  "early_warning_signals": [
+    "Insufficient data — manual review recommended",
+    "LLM analysis unavailable; conservative risk applied"
+  ],
+  "raw_snippets_used": 10,
+  "timestamp": "2026-03-11T19:45:24.821257+00:00"
 }

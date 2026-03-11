@@ -3,18 +3,15 @@ CertifAI — Full Pipeline Orchestrator
 ======================================
 Wires all four agent modules together via shared JSON state in shared_data/.
 
+Pipeline (in order):
+  ingestor → research → credit → cam
+
 Usage:
-    # Step 1 — Ingest financial documents
-    python app.py --mode ingestor --company "Arjun Textiles Pvt. Ltd."
-
-    # Step 2 — Run OSINT Research Agent (needs GEMINI_API_KEY)
-    python app.py --mode research --company "Arjun Textiles Pvt. Ltd." --sector "Textiles"
-
-    # Step 3 — Generate CAM PDF report
+    python app.py --mode ingestor  --company "Arjun Textiles Pvt. Ltd."
+    python app.py --mode research  --company "Arjun Textiles Pvt. Ltd." --sector "Textiles"
+    python app.py --mode credit
     python app.py --mode cam
-
-    # Run everything end-to-end
-    python app.py --mode all --company "Arjun Textiles Pvt. Ltd." --sector "Textiles"
+    python app.py --mode all       --company "Arjun Textiles Pvt. Ltd." --sector "Textiles"
 """
 
 import argparse
@@ -49,31 +46,29 @@ def run_ingestor(company: str = "") -> None:
         output_json_path=SHARED["financial_summary"],
     )
 
-    # Enrich output JSON with CAM-generator-expected fields (using ingestor values as proxies)
+    # Enrich output JSON with balance-sheet fields needed by credit_engine & CAM
     with open(SHARED["financial_summary"], "r") as f:
         data = json.load(f)
 
-    rev = data["metrics"]["revenue"]
+    rev  = data["metrics"]["revenue"]
     debt = data["metrics"]["debt"]
-    cf = data["metrics"]["cash_flow"]
+    cf   = data["metrics"]["cash_flow"]
 
-    # Derive approximate balance-sheet fields so CAM can render a full table
     enriched = {
-        "company_name":           data["company_name"] or company or "Unknown",
-        "fiscal_year":            "FY 2024-25",
-        "revenue":                rev / 1e5,            # convert to Lakhs for CAM
-        "ebit":                   cf * 0.85 / 1e5,
-        "ebitda":                 cf / 1e5,
-        "total_assets":           (rev * 0.9) / 1e5,
-        "total_liabilities":      debt / 1e5,
-        "current_assets":         (rev * 0.4) / 1e5,
-        "current_liabilities":    (debt * 0.4) / 1e5,
-        "retained_earnings":      (rev * 0.1) / 1e5,
-        "operating_cash_flow":    cf / 1e5,
-        "collateral_value":       (debt * 0.5) / 1e5,
-        "loan_amount_requested":  (debt * 0.3) / 1e5,
-        # Keep fraud flags for reference
-        "fraud_flags":            data.get("fraud_flags", []),
+        "company_name":          data["company_name"] or company or "Unknown",
+        "fiscal_year":           "FY 2024-25",
+        "revenue":               rev  / 1e5,        # convert to Lakhs
+        "ebit":                  cf   * 0.85 / 1e5,
+        "ebitda":                cf   / 1e5,
+        "total_assets":          (rev  * 0.9) / 1e5,
+        "total_liabilities":     debt / 1e5,
+        "current_assets":        (rev  * 0.4) / 1e5,
+        "current_liabilities":   (debt * 0.4) / 1e5,
+        "retained_earnings":     (rev  * 0.1) / 1e5,
+        "operating_cash_flow":   cf   / 1e5,
+        "collateral_value":      (debt * 0.5) / 1e5,
+        "loan_amount_requested": (debt * 0.3) / 1e5,
+        "fraud_flags":           data.get("fraud_flags", []),
     }
 
     with open(SHARED["financial_summary"], "w") as f:
@@ -98,7 +93,7 @@ def run_research(company: str, sector: str) -> None:
     if not os.environ.get("GEMINI_API_KEY"):
         print("\n  ⚠️  GEMINI_API_KEY not set.")
         print("  ℹ️  Skipping live OSINT — using existing external_intelligence.json sample data.")
-        print("  ℹ️  To enable: export GEMINI_API_KEY=your_key_here")
+        print("  ℹ️  To enable: add GEMINI_API_KEY=your_key to the .env file")
         return
 
     try:
@@ -114,12 +109,36 @@ def run_research(company: str, sector: str) -> None:
         print("  ℹ️  Proceeding with existing external_intelligence.json sample data.")
 
 
+def run_credit() -> None:
+    """Step 3 — Compute Altman Z-Score, PD, LGD → risk_decision.json."""
+    from modules.credit_engine import run_credit_engine
+
+    print("\n" + "═" * 60)
+    print("  STEP 3 — Credit Engine (Altman Z-Score · PD · LGD · Loan Structuring)")
+    print("═" * 60)
+
+    result = run_credit_engine(
+        financial_json_path=SHARED["financial_summary"],
+        intelligence_json_path=SHARED["external_intelligence"],
+        output_json_path=SHARED["risk_decision"],
+    )
+
+    print(f"\n  ✅ Decision        : {result['decision']}")
+    print(f"  ✅ Altman Z-Score  : {result['altman_z_score']}")
+    print(f"  ✅ PD              : {result['PD']:.2%}")
+    print(f"  ✅ LGD             : {result['LGD']:.2%}")
+    print(f"  ✅ Expected Loss   : ₹{result['expected_loss']:,.2f}L")
+    print(f"  ✅ Max Loan        : ₹{result['max_loan_amount']:,.2f}L")
+    print(f"  ✅ Interest Rate   : {result['interest_rate']:.2%}")
+    print(f"\n  Saved → {SHARED['risk_decision']}")
+
+
 def run_cam() -> None:
-    """Step 3 — Generate CAM PDF from the three upstream JSONs."""
+    """Step 4 — Generate CAM PDF from the three upstream JSONs."""
     from modules.cam_generator import generate_cam_report
 
     print("\n" + "═" * 60)
-    print("  STEP 3 — CAM Generator (PDF Report)")
+    print("  STEP 4 — CAM Generator (PDF Report)")
     print("═" * 60)
 
     generate_cam_report(
@@ -141,13 +160,14 @@ def main() -> None:
 Modes:
   ingestor  Parse financial documents in shared_data/uploads/
   research  Run OSINT + Gemini risk analysis   (needs GEMINI_API_KEY)
+  credit    Compute Altman Z-Score, PD, LGD, loan structure   [NEW]
   cam       Generate the final CAM PDF report
-  all       Run ingestor → research → cam in sequence
+  all       Run full pipeline: ingestor → research → credit → cam
         """,
     )
     parser.add_argument(
         "--mode",
-        choices=["ingestor", "research", "cam", "all"],
+        choices=["ingestor", "research", "credit", "cam", "all"],
         default="all",
         help="Which pipeline step(s) to run (default: all)",
     )
@@ -160,6 +180,9 @@ Modes:
 
     if args.mode in ("research", "all"):
         run_research(company=args.company, sector=args.sector)
+
+    if args.mode in ("credit", "all"):
+        run_credit()
 
     if args.mode in ("cam", "all"):
         run_cam()

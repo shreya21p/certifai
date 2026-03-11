@@ -16,7 +16,10 @@ from typing import Optional
 
 from google import genai
 from google.genai import types as genai_types
-from duckduckgo_search import DDGS
+try:
+    from ddgs import DDGS          # new package name (ddgs >= 1.0)
+except ImportError:
+    from duckduckgo_search import DDGS  # fallback for older installs
 from pydantic import BaseModel, field_validator
 
 # ---------------------------------------------------------------------------
