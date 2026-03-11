@@ -1,0 +1,20 @@
+# Core data & validation
+pandas>=2.0
+openpyxl>=3.1
+pydantic>=2.0
+python-dotenv>=1.0
+
+# Google Generative AI (Gemini)
+google-generativeai>=0.5
+google-genai>=0.8
+
+# Web search (Research Agent)
+duckduckgo-search>=5.3
+
+# PDF generation (CAM Generator)
+reportlab>=4.1
+matplotlib>=3.8
+numpy>=1.26
+
+# Testing
+pytest>=8.0
