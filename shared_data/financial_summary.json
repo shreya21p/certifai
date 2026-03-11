@@ -1,33 +1,17 @@
 {
-<<<<<<< HEAD
   "_comment": "Sample financial_summary.json — produced by the Ingestor module. All monetary values in INR (lakhs).",
   "company_name": "Arjun Textiles Pvt. Ltd.",
   "fiscal_year": "FY2024-25",
-
-  "revenue":               4800.0,
-  "ebit":                   720.0,
-  "ebitda":                 960.0,
-  "total_assets":          6200.0,
-  "total_liabilities":     3800.0,
-  "current_assets":        1500.0,
-  "current_liabilities":    900.0,
-  "retained_earnings":     1100.0,
-  "market_cap":            2400.0,
-  "operating_cash_flow":    680.0,
-
+  "revenue": 4800.0,
+  "ebit": 720.0,
+  "ebitda": 960.0,
+  "total_assets": 6200.0,
+  "total_liabilities": 3800.0,
+  "current_assets": 1500.0,
+  "current_liabilities": 900.0,
+  "retained_earnings": 1100.0,
+  "market_cap": 2400.0,
+  "operating_cash_flow": 680.0,
   "loan_amount_requested": 2000.0,
-  "collateral_value":      2800.0
+  "collateral_value": 2800.0
 }
-=======
-  "company_name": "Acme Industries Ltd",
-  "metrics": {
-    "revenue": 50000000,
-    "debt": 15000000,
-    "cash_flow": 8000000,
-    "gst_sales": 45000000,
-    "bank_inflows": 30000000,
-    "promoter_pledge_percent": 22.5
-  },
-  "fraud_flags": []
-}
->>>>>>> 5e0fe1d (feat: Develop financial data ingestor to parse structured files, detect anomalies, and generate reports.)
