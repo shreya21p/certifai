@@ -1,4 +1,68 @@
 """
+CertifAI — Shared State Orchestrator
+=====================================
+Entry point that wires all agent modules together via shared JSON state.
+
+Usage examples:
+    # Run only the Research Agent
+    python app.py --mode research --company "Adani Ports" --sector "Infrastructure"
+
+    # Run all agents in sequence (full pipeline)
+    python app.py --mode all --company "Reliance Retail" --sector "Retail"
+"""
+
+import argparse
+import json
+import os
+
+# Shared output paths (single source of truth for all agents)
+SHARED = {
+    "financial_summary":      "shared_data/financial_summary.json",
+    "external_intelligence":  "shared_data/external_intelligence.json",
+    "risk_decision":          "shared_data/risk_decision.json",
+    "final_cam_report":       "shared_data/final_cam_report.pdf",
+}
+
+
+def run_research(company: str, sector: str) -> None:
+    """Run the Research Agent (OSINT) module."""
+    from modules.research_agent import run_research_agent
+
+    result = run_research_agent(
+        company_name=company,
+        sector=sector,
+        output_json_path=SHARED["external_intelligence"],
+    )
+    print("\n=== Research Agent Output ===")
+    print(json.dumps(result.model_dump(), indent=2))
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="CertifAI — Digital Credit OSINT Platform"
+    )
+    parser.add_argument(
+        "--mode",
+        choices=["research", "all"],
+        default="research",
+        help="Which agent module(s) to run",
+    )
+    parser.add_argument("--company", required=True, help="Company name")
+    parser.add_argument("--sector",  required=True, help="Business sector")
+    args = parser.parse_args()
+
+    if args.mode in ("research", "all"):
+        run_research(args.company, args.sector)
+
+    # Future agents will be plugged in here:
+    # if args.mode == "all":
+    #     run_credit_engine(...)
+    #     run_cam_generator(...)
+
+
+if __name__ == "__main__":
+    main()
+"""
 app.py — CertifAI Platform Entry Point
 =======================================
 Orchestrates the full underwriting pipeline.
