@@ -1,0 +1,12 @@
+{
+  "decision": "REJECT",
+  "PD": 0.665,
+  "LGD": 0.02,
+  "expected_loss": 26.6,
+  "max_loan_amount": 566.67,
+  "interest_rate": 0.1798,
+  "altman_z_score": 1.6184,
+  "base_pd_before_intel_adjustment": 0.65,
+  "loan_amount_requested": 2000.0,
+  "evaluated_at": "2026-03-11T18:41:39.153548+00:00"
+}
