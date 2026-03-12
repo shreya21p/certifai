@@ -153,6 +153,7 @@ with tab1:
 
     z_score    = result["z_score"]
     z_band     = result["z_band"]
+    z_band_narrative = result.get("z_band_narrative", "")
     pd         = result["pd"]
     lgd        = result["lgd"]
     max_loan   = result["max_loan"]
@@ -186,7 +187,7 @@ Sector: {sector}
 Loan Requested: ₹{loan_amount}Cr
 
 QUANTITATIVE RESULTS:
-- Altman Z-Score: {z_band_label}
+- Altman Z-Score: {z_score} — {z_band_narrative}
 - Probability of Default: {pd_pct}%
 - Loss Given Default: {lgd_pct}%
 - Max Recommended Loan: ₹{max_loan}Cr
@@ -201,6 +202,27 @@ INDIA-SPECIFIC RISK INDICATORS:
 - MCA Filing Status: {mca_status}
 - RBI/GST Compliance Score: {rbi_compliance}
 - Triangulation Flags: {len(tri_flags_raw)} contradictions between web and documents
+
+CRITICAL SCORING RULES FOR FIVE Cs — follow these exactly:
+- Score of 1-2: Reserved ONLY for companies that should be REJECTED. Do not use these for APPROVE decisions.
+- Score of 3-4: Significant concerns but approvable with conditions.
+- Score of 5-6: Average — concerns present but manageable.
+- Score of 7-8: Good — minor concerns only.
+- Score of 9-10: Excellent — no material concerns.
+
+For THIS company the decision is {decision} with {conf_pct}% confidence.
+If decision is APPROVE, no single C score should be below 3.
+If decision is MANUAL_REVIEW, no single C score should be below 2.
+If decision is REJECT, scores of 1-2 are appropriate.
+
+Also follow these India-specific scoring adjustments:
+- CIBIL Commercial Score 7-8 → Character +1
+- CIBIL Commercial Score 9-10 → Character +2
+- Zero GSTR variance → Character +1
+- Active e-Courts > 5 → Capacity -2
+- Active e-Courts 1-5 → Capacity -1
+- DSCR > 2.0 → Capacity +1
+- MCA gap > 365 days → Character -1
 
 RISK FLAGS: {json.dumps(doc_flags[:5], default=str)}
 EXTERNAL RISK SCORE: {ext_risk}/10
@@ -241,10 +263,25 @@ Return JSON with exactly these fields:
 
     decision_rationale     = (gemini_response or {}).get("decision_rationale", [])
     swot                   = (gemini_response or {}).get("swot", {})
-    five_cs                = (gemini_response or {}).get("five_cs_assessment", {})
+    five_cs_raw            = (gemini_response or {}).get("five_cs_assessment", {})
     conditions             = (gemini_response or {}).get("conditions_if_approved", [])
     rejection_reason       = (gemini_response or {}).get("rejection_reason")
     india_concerns         = (gemini_response or {}).get("india_specific_concerns", [])
+
+    def validate_five_cs(five_cs: dict, decision: str) -> dict:
+        """Ensure Five Cs scores are internally consistent with the decision."""
+        min_score = {"APPROVE": 3, "MANUAL_REVIEW": 2, "REJECT": 1}.get(decision, 2)
+        for c in ["character", "capacity", "capital", "collateral", "conditions"]:
+            if c in five_cs:
+                score = five_cs[c].get("score", 5)
+                if score < min_score:
+                    five_cs[c]["score"] = min_score
+                    five_cs[c]["comment"] += (
+                        f" [Score floor applied: minimum {min_score} for {decision} decision]"
+                    )
+        return five_cs
+
+    five_cs = validate_five_cs(five_cs_raw, decision)
 
     # ── BUILD & SAVE OUTPUT PAYLOAD ──────────────────────────────────────────
     # Compute fraud_score for the output contract

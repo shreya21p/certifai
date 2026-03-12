@@ -104,9 +104,11 @@ class CreditEngine:
         external_risk: float,
         z_score: float,
         research_payload: dict | None = None,
+        entity: dict | None = None,
     ) -> float:
         """Rule-based PD in [0.0, 0.95]."""
         research_payload = research_payload or {}
+        entity = entity or {}
 
         # ── Base PD from Z-score band ────────────────────────────────────
         if z_score > 2.99:
@@ -169,7 +171,56 @@ class CreditEngine:
         )
         pd += critical_tri * 0.08
 
+        # ── POSITIVE INDICATOR BONUSES (reduce PD) ───────────────────────
+
+        # CIBIL bonus — strong score is a direct predictor of repayment
+        cibil = f.get("cibil_commercial_score") or entity.get("cibil_commercial_score") if hasattr(f, 'get') else None
+        if cibil:
+            try:
+                cibil_val = float(cibil)
+                if cibil_val >= 8:   pd -= 0.10   # excellent credit history
+                elif cibil_val >= 7: pd -= 0.06   # good credit history
+                elif cibil_val >= 6: pd -= 0.03   # above average
+            except (ValueError, TypeError):
+                pass
+
+        # Zero / low GST variance bonus — clean compliance
+        gst_var = float(f.get("gst_2a_vs_3b_variance_pct") or 0)
+        if gst_var == 0 or gst_var < 2:
+            pd -= 0.05    # clean GST record is strong character signal
+
+        # Strong DSCR bonus
+        cf = float(f.get("operating_cashflow_cr") or 0)
+        td = float(f.get("total_debt_cr") or 1)
+        dscr = _safe_div(cf, max(td * 0.12, 0.01))
+        if dscr > 2.0:   pd -= 0.06
+        elif dscr > 1.5: pd -= 0.03
+
+        # Revenue growth signal (if 3-year data available)
+        rev_growth = float(f.get("revenue_cagr_3yr_pct") or 0)
+        if rev_growth > 15: pd -= 0.04
+        elif rev_growth > 8: pd -= 0.02
+
+        # Floor — PD cannot go below 3% for any live company
+        pd = max(0.03, round(pd, 4))
+
         return round(min(pd, 0.95), 4)
+
+    # ────────────────────────────────────────────────────────────────────────
+    # 2.5 Z-BAND NARRATIVE
+    # ────────────────────────────────────────────────────────────────────────
+    def z_band(self, z: float) -> tuple[str, str]:
+        """Returns (band_label, narrative_description)"""
+        if z > 2.99:
+            return "Safe Zone", f"Z-Score {z:.2f} — above 2.99 safe threshold. Low financial distress risk."
+        elif z > 2.60:
+            return "Upper Grey Zone", f"Z-Score {z:.2f} — approaching safe zone. One strong financial year would push to safe territory."
+        elif z > 2.20:
+            return "Mid Grey Zone", f"Z-Score {z:.2f} — moderate distress risk. Monitor leverage and cashflow closely."
+        elif z > 1.81:
+            return "Lower Grey Zone", f"Z-Score {z:.2f} — near grey/distress boundary. Revenue growth trajectory is the key watchpoint."
+        else:
+            return "Distress Zone", f"Z-Score {z:.2f} — below 1.81 distress threshold. High default probability indicated."
 
     # ────────────────────────────────────────────────────────────────────────
     # 3. LOSS GIVEN DEFAULT
@@ -366,13 +417,15 @@ class CreditEngine:
         ext_risk = float(research_output.get("composite_external_risk_score") or 5)
 
         # ── Core calculations ────────────────────────────────────────────
-        z_score, z_band = self.calculate_altman_z_score(f)
+        z_score, _ = self.calculate_altman_z_score(f)
+        z_band_label, z_band_narrative = self.z_band(z_score)
 
         pd = self.calculate_pd(
             f=f,
             external_risk=ext_risk,
             z_score=z_score,
             research_payload=research_payload,
+            entity=entity,
         )
 
         collateral_type  = entity.get("collateral_type", "None")
@@ -411,7 +464,8 @@ class CreditEngine:
 
         return {
             "z_score":           z_score,
-            "z_band":            z_band,
+            "z_band":            z_band_label,
+            "z_band_narrative":  z_band_narrative,
             "pd":                pd,
             "lgd":               lgd,
             "max_loan":          max_loan,

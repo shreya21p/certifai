@@ -132,6 +132,34 @@ def build_cam_prompt() -> str:
     tri_s   = json.dumps(tri_flags[:5], default=str)
     flags_s = json.dumps(doc_flags[:5], default=str)
 
+    # Fetch Z-band narrative directly
+    from utils.credit_engine import CreditEngine
+    engine = CreditEngine()
+    z_band_label, z_band_narrative = engine.z_band(z_score)
+
+    web_context = research_payload.get("web_context_used", {})
+    def summarise_web_context(web_context: dict) -> str:
+        lines = []
+        search_map = {
+            "news_context":     "General news search",
+            "legal_context":    "Legal/litigation search (NCLT, court, default)",
+            "sector_context":   "Sector outlook search",
+            "promoter_context": "Promoter background search",
+            "mca_context":      "MCA/ROC compliance search",
+            "gst_context":      "GST compliance/notice search",
+        }
+        for key, label in search_map.items():
+            content = web_context.get(key, "")
+            if content and len(content.strip()) > 20:
+                word_count = len(content.split())
+                lines.append(f"- {label}: {word_count} words of intelligence gathered")
+            else:
+                lines.append(f"- {label}: No adverse findings in public domain")
+        return "\n".join(lines)
+
+    research_evidence = summarise_web_context(web_context)
+    search_date = research_payload.get("research_timestamp", datetime.now().isoformat())[:10]
+
     return f"""
 You are an AI Credit Committee generating a formal Credit Appraisal Memo for an Indian corporate borrower.
 Act as FIVE specialist agents in sequence:
@@ -148,7 +176,9 @@ AGENT 5 — EWI ANALYST: Identify early warning indicators from all signals incl
 BORROWER DATA:
 Company: {company_name} | CIN: {cin} | Sector: {sector}
 Loan: ₹{loan_amount}Cr | Decision: {decision} | Max Approved: ₹{max_loan}Cr @ {rate}%
-Z-Score: {z_score} | PD: {pd_val*100:.1f}% | LGD: {lgd_val*100:.1f}% | Confidence: {confidence*100:.0f}%
+Altman Z-Score: {z_score} — {z_band_narrative}
+Note: Do NOT describe this as 'firmly in grey zone' — use the exact narrative above.
+PD: {pd_val*100:.1f}% | LGD: {lgd_val*100:.1f}% | Confidence: {confidence*100:.0f}%
 
 FINANCIALS (₹Cr):
 Revenue: {financials.get('revenue_cr','N/A')} | EBITDA: {financials.get('ebitda_cr','N/A')}
@@ -169,6 +199,17 @@ FRAUD FLAGS: {flags_s}
 TRIANGULATION FLAGS: {tri_s}
 EARLY WARNING SIGNALS: {ewi_s}
 SECTOR SUMMARY: {ro.get('sector_summary', '')}
+
+WEB INTELLIGENCE CONDUCTED ON {search_date}:
+{research_evidence}
+
+INSTRUCTION FOR SECTION 4 (Promoter Background) AND SECTION 11 (Early Warning Indicators):
+You MUST include a sentence like: "Web intelligence search conducted on {search_date} [found/found no] adverse public domain information beyond [specific findings or 'the items noted above']."
+This is mandatory — do not omit it.
+
+INSTRUCTION FOR SECTION 6 (Industry Outlook):
+You MUST reference the specific sector intelligence gathered from web search.
+Cite at least one specific policy, regulation, or market development found.
 
 Generate ALL 12 CAM sections in professional Indian banking language.
 Be specific. Use exact numbers. Do NOT invent data.
@@ -227,6 +268,14 @@ confidence_scores = {s: score_section(s) for s in CAM_SECTIONS}
 st.markdown("## ✍️ Review & Edit CAM Sections")
 st.caption("Each section is AI-generated. Edit as needed — changes are tracked for the audit log.")
 
+web_context = research_payload.get("web_context_used", {})
+search_date = research_payload.get("research_timestamp", datetime.now().isoformat())[:10]
+st.caption(
+    f"🔍 Web intelligence conducted: {search_date} | "
+    f"Searches: {len([v for v in web_context.values() if v and len(v) > 20])}/6 returned results | "
+    f"Triangulation checks: 5 | Conflicts found: {len(research_payload.get('triangulation_flags', []))}"
+)
+
 SECTION_LABELS = {
     "committee_summary":       "1. Committee Summary",
     "executive_summary":       "2. Executive Summary",
@@ -277,16 +326,70 @@ pat   = float(financials.get("pat_cr")                or 0)
 debt  = float(financials.get("total_debt_cr")         or 0)
 nw    = float(financials.get("net_worth_cr")          or 1)
 ocf   = float(financials.get("operating_cashflow_cr") or 0)
-gst_v = financials.get("gst_2a_vs_3b_variance_pct", "N/A")
-cibil = entity.get("cibil_commercial_score") or financials.get("cibil_commercial_score", "N/A")
-de    = round(debt / max(nw, 0.01), 2)
-dscr  = round(ocf  / max(debt * 0.12, 0.01), 2)
 
-financial_table = pd.DataFrame({
-    "Metric":  ["Revenue (₹Cr)", "EBITDA (₹Cr)", "PAT (₹Cr)", "Total Debt (₹Cr)",
-                "D/E Ratio", "DSCR", "GSTR-2A vs 3B Variance (%)", "CIBIL Commercial Score"],
-    "FY2024":  [rev, ebit, pat, debt, de, dscr, gst_v, cibil],
-})
+gst_variance  = (
+    financials.get("gst_2a_vs_3b_variance_pct")
+    or extraction_payload.get("gst_variance_pct")
+    or entity.get("gst_variance_pct")
+    or "0.0"   # default — zero variance if not computed
+)
+
+mca_date_raw  = entity.get("mca_last_filing_date")
+if mca_date_raw:
+    try:
+        from datetime import datetime, date
+        if isinstance(mca_date_raw, str):
+            mca_date = datetime.strptime(mca_date_raw[:10], "%Y-%m-%d").date()
+        else:
+            mca_date = mca_date_raw
+        mca_gap_days = (date.today() - mca_date).days
+        mca_display  = f"{mca_date_raw} ({mca_gap_days} days ago)"
+    except Exception:
+        mca_display = str(mca_date_raw)
+        mca_gap_days = 0 # fallback
+else:
+    mca_display = "Not Provided"
+    mca_gap_days = 0 
+
+cibil = (
+    financials.get("cibil_commercial_score")
+    or entity.get("cibil_commercial_score")
+    or "N/A"
+)
+
+dscr = round(
+    (float(financials.get("operating_cashflow_cr") or 0)) /
+    max(float(financials.get("total_debt_cr") or 1) * 0.12, 0.01), 2
+)
+
+de_ratio = round(
+    (float(financials.get("total_debt_cr") or 0)) /
+    max(float(financials.get("net_worth_cr") or 1), 0.01), 2
+)
+
+# Build the deterministic table — NEVER use LLM for these numbers
+financial_summary_rows = [
+    ("Revenue (₹ Cr)",              financials.get("revenue_cr", "N/A")),
+    ("EBITDA (₹ Cr)",               financials.get("ebitda_cr", "N/A")),
+    ("PAT (₹ Cr)",                  financials.get("pat_cr", "N/A")),
+    ("Total Debt (₹ Cr)",           financials.get("total_debt_cr", "N/A")),
+    ("D/E Ratio",                   f"{de_ratio}x"),
+    ("DSCR",                        f"{dscr}x"),
+    ("GSTR-2A vs 3B Variance (%)",  f"{gst_variance}%"),
+    ("CIBIL Commercial Score",      f"{cibil}/10"),
+    ("MCA Last Filing",             mca_display),
+]
+
+financial_table = pd.DataFrame(financial_summary_rows, columns=["Metric", "FY2024"])
+
+india_compliance_rows = [
+    ("CIBIL Commercial Score",   f"{cibil}/10",      "Low Risk" if float(str(cibil).replace('/10','') or 7) >= 7 else "High Risk"),
+    ("GSTR-2A vs 3B Variance",   f"{gst_variance}%", "High Risk" if float(str(gst_variance) or 0) > 15 else "Low Risk"),
+    ("MCA Last Filing",          mca_display,         "High Risk" if mca_gap_days > 365 else "Medium Risk" if mca_gap_days > 180 else "Low Risk"),
+    ("e-Courts Active Cases",    str(entity.get("ecourt_cases_count", 0)), "High Risk" if int(entity.get("ecourt_cases_count", 0)) > 5 else "Low Risk"),
+    ("RBI Compliance",           entity.get("rbi_circular_status", "N/A"), "Low Risk" if "Compliant" in str(entity.get("rbi_circular_status","")) else "High Risk"),
+    ("Triangulation Conflicts",  str(len(research_payload.get("triangulation_flags", []))), "High Risk" if len(research_payload.get("triangulation_flags", [])) > 0 else "Low Risk"),
+]
 
 def generate_chart() -> str:
     path = "./data/revenue_chart.png"
@@ -310,6 +413,17 @@ def generate_chart() -> str:
 
 st.markdown("## 📊 Financial Summary (Deterministic)")
 st.dataframe(financial_table, use_container_width=True, hide_index=True)
+
+with st.expander("🔍 Data Lineage — Extraction Audit Trail", expanded=False):
+    lineage_data = extraction_payload.get("data_lineage", {})
+    lineage_rows = []
+    for k, v in list(lineage_data.items())[:20]:
+        val = financials.get(k) or entity.get(k) or "N/A"
+        lineage_rows.append({"Field": k, "Extracted Value": val, "Source & Page": v[:100]})
+    if lineage_rows:
+        st.dataframe(pd.DataFrame(lineage_rows), use_container_width=True, hide_index=True)
+    else:
+        st.info("No data lineage audit trail available for this scenario.")
 
 # ── STEP 6 & 7: Generate PDFs + Word on button click ─────────────────────────
 st.divider()
@@ -441,26 +555,9 @@ def build_pdf(chart_path: str) -> bytes:
     story.append(HRFlowable(width="100%", thickness=1, color=NAVY))
     story.append(Spacer(1, 0.3*cm))
 
-    def _risk_band(val, thresholds, bands):
-        try:
-            fval = float(val)
-            for t, b in zip(thresholds, bands):
-                if fval <= t:
-                    return b
-        except (TypeError, ValueError):
-            pass
-        return bands[-1]
-
     india_rows = [["Indicator", "Value", "Risk Band"]]
-    india_rows += [
-        ["CIBIL Commercial Score",    f"{cibil}/10",  _risk_band(cibil, [4,6,8], ["Critical","High","Moderate","Low"])],
-        ["GSTR-2A vs 3B Variance",    f"{gst_v}%",   _risk_band(gst_v, [5,15], ["Low","Moderate","High"])],
-        ["MCA Last Filing Date",       str(pi.get("mca_last_filing_date","N/A")), ""],
-        ["e-Courts Active Cases",      str(pi.get("ecourt_cases_found",0)),
-         _risk_band(pi.get("ecourt_cases_found",0), [0,2,5], ["Nil","Low","Moderate","High"])],
-        ["RBI Compliance Status",      str(pi.get("rbi_compliance","N/A")),       ""],
-        ["Triangulation Conflicts",    str(len(tri_flags)), "Critical" if len(tri_flags) > 1 else ("Moderate" if tri_flags else "Nil")],
-    ]
+    for r in india_compliance_rows:
+        india_rows.append(list(r))
     comp_tbl = Table(india_rows, colWidths=[6*cm, 5*cm, 6*cm])
     comp_tbl.setStyle(TableStyle([
         ("BACKGROUND", (0,0), (-1,0), NAVY),
@@ -540,19 +637,23 @@ def build_pdf(chart_path: str) -> bytes:
         story += [fc_tbl, PageBreak()]
 
     # ── Appendix: data lineage ────────────────────────────────────────────────
-    lineage = EP.get("data_lineage", {})
-    story.append(Paragraph("Appendix — Data Lineage", H1))
+    story.append(PageBreak())
+    story.append(Paragraph("Appendix — Data Lineage & Extraction Audit", H1))
     story.append(HRFlowable(width="100%", thickness=1, color=NAVY))
     story.append(Spacer(1, 0.3*cm))
-    if lineage:
-        lin_rows = [["Field", "Source"]]
-        for k, v in list(lineage.items())[:20]:
-            lin_rows.append([k, str(v)[:80]])
-        lin_tbl = Table(lin_rows, colWidths=[6*cm, 11*cm])
+    if lineage_rows:
+        lin_rows = [["Field", "Extracted Value", "Source & Page"]]
+        for r in lineage_rows:
+            lin_rows.append([r["Field"], str(r["Extracted Value"])[:40], str(r["Source & Page"])])
+        lin_tbl = Table(lin_rows, colWidths=[4*cm, 4*cm, 9*cm])
         lin_tbl.setStyle(TableStyle([
+            ("BACKGROUND", (0,0), (-1,0), NAVY),
+            ("TEXTCOLOR", (0,0), (-1,0), colors.white),
+            ("FONTNAME", (0,0), (-1,0), "Helvetica-Bold"),
             ("FONTSIZE", (0,0), (-1,-1), 8),
             ("GRID", (0,0), (-1,-1), 0.3, colors.lightgrey),
             ("ROWBACKGROUNDS", (0,1), (-1,-1), [colors.whitesmoke, colors.white]),
+            ("VALIGN", (0,0), (-1,-1), "TOP"),
         ]))
         story.append(lin_tbl)
     else:
@@ -667,16 +768,10 @@ def build_word() -> bytes:
     headers = ["Indicator", "Value", "Risk Band"]
     for j, h in enumerate(headers):
         ict.cell(0, j).text = h
-    rows_data = [
-        ("CIBIL Commercial Score", f"{cibil}/10", ""),
-        ("GSTR-2A vs 3B Variance", f"{gst_v}%", ""),
-        ("MCA Last Filing Date",   str(pi.get("mca_last_filing_date","N/A")), ""),
-        ("e-Courts Active Cases",  str(pi.get("ecourt_cases_found",0)), ""),
-        ("RBI Compliance",         str(pi.get("rbi_compliance","N/A")), ""),
-        ("Triangulation Conflicts",str(len(tri_flags)), ""),
-    ]
-    for i, (a,b,c) in enumerate(rows_data, 1):
-        ict.cell(i,0).text = a; ict.cell(i,1).text = b; ict.cell(i,2).text = c
+    for i, (a,b,c) in enumerate(india_compliance_rows, 1):
+        ict.cell(i,0).text = a
+        ict.cell(i,1).text = str(b)
+        ict.cell(i,2).text = str(c)
 
     doc.add_page_break()
 
@@ -703,6 +798,23 @@ def build_word() -> bytes:
             fc_tbl.cell(i,0).text = c_key.title()
             fc_tbl.cell(i,1).text = str(cd.get("score","N/A"))
             fc_tbl.cell(i,2).text = cd.get("comment","")
+
+    doc.add_page_break()
+
+    # Appendix: data lineage
+    doc.add_heading("Appendix — Data Lineage & Extraction Audit", 1)
+    if lineage_rows:
+        lin_tbl = doc.add_table(rows=len(lineage_rows)+1, cols=3)
+        lin_tbl.style = "Table Grid"
+        lin_tbl.cell(0,0).text = "Field"
+        lin_tbl.cell(0,1).text = "Extracted Value"
+        lin_tbl.cell(0,2).text = "Source & Page"
+        for i, r in enumerate(lineage_rows, 1):
+            lin_tbl.cell(i,0).text = r["Field"]
+            lin_tbl.cell(i,1).text = str(r["Extracted Value"])[:40]
+            lin_tbl.cell(i,2).text = str(r["Source & Page"])
+    else:
+        doc.add_paragraph("Data lineage not available for this session.")
 
     buf = io.BytesIO()
     doc.save(buf)
