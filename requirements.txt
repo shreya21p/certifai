@@ -2,7 +2,7 @@
 streamlit==1.54.0
 
 # AI / LLM
-google-generativeai==0.8.6
+google-genai==1.66.0
 
 # Document parsing
 docling==2.78.0

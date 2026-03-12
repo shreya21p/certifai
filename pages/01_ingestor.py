@@ -117,9 +117,36 @@ def render_step_1():
     with st.expander("View Saved Context"):
         st.json(st.session_state["entity_context"])
 
+FILENAME_KEYWORDS = {
+    "ALM":                  ["alm", "asset_liab", "assetliab", "liquidity"],
+    "ShareholdingPattern":  ["shareholding", "shareholder", "ownership", "promoter"],
+    "BorrowingProfile":     ["borrow", "debt", "loan_profile", "credit_profile"],
+    "AnnualReport":         ["annual", "p&l", "pnl", "financials", "balance_sheet"],
+    "PortfolioPerformance": ["portfolio", "npa", "dpd", "par", "collection", "vintage"],
+    "BankStatement":        ["bank", "statement", "txn", "transaction"],
+    "GSTReturn":            ["gst", "gstr", "tax_return"],
+}
+
+def classify_by_filename(filename: str) -> dict:
+    """Fast offline classifier: keyword-match the filename. No API call needed."""
+    name_lower = filename.lower()
+    for doc_type, keywords in FILENAME_KEYWORDS.items():
+        if any(kw in name_lower for kw in keywords):
+            return {
+                "filename": filename,
+                "detected_type": doc_type,
+                "confidence": 0.75,
+                "reasoning": f"Classified from filename keywords (offline fallback). API unavailable or rate-limited."
+            }
+    return {
+        "filename": filename,
+        "detected_type": "Unknown",
+        "confidence": 0.3,
+        "reasoning": "No keyword match in filename. Please override manually."
+    }
+
 def classify_document(filename, file_bytes):
     ext = os.path.splitext(filename)[1].lower()
-    preview_text = ""
     contents = []
     
     prompt = f"""You are a document classifier for Indian corporate credit underwriting.
@@ -138,7 +165,7 @@ def classify_document(filename, file_bytes):
                 tf_path = tf.name
             try:
                 markdown_text = parse_document(tf_path)
-                preview_text = markdown_text[:2000] # First 2000 chars roughly 500 words
+                preview_text = markdown_text[:2000]
             finally:
                 os.remove(tf_path)
             contents = [prompt + "\n\nPreview: " + preview_text]
@@ -149,13 +176,19 @@ def classify_document(filename, file_bytes):
             }
             contents = [prompt, img_data]
         else:
-            return None # Unsupported
+            return classify_by_filename(filename)
             
         res_text = call_gemini_with_retry(contents, response_mime_type="application/json")
         res_json = json.loads(res_text)
         return res_json
     except Exception as e:
-        print(f"Classification error for {filename}: {e}")
+        err_str = str(e)
+        is_quota = "429" in err_str or "RESOURCE_EXHAUSTED" in err_str or "quota" in err_str.lower()
+        is_key_err = "400" in err_str or "403" in err_str or "expired" in err_str.lower() or "leaked" in err_str.lower()
+        if is_quota or is_key_err:
+            st.warning(f"⚠️ API unavailable for **{filename}** — using filename-based classification instead.")
+            return classify_by_filename(filename)
+        st.error(f"Classification error for {filename}: {e}")
         return {"filename": filename, "detected_type": "Unknown", "confidence": 0.0, "reasoning": str(e)}
 
 def render_step_2():
@@ -164,14 +197,24 @@ def render_step_2():
     uploaded_files = st.file_uploader("Upload financial documents", accept_multiple_files=True, type=['pdf', 'xlsx', 'csv', 'jpg', 'jpeg', 'png'])
     
     if st.button("Run Auto-Classification") and uploaded_files:
-        with st.spinner("Classifying documents..."):
-            for f in uploaded_files:
-                if f.name not in st.session_state["classification_results"]:
-                    res = classify_document(f.name, f.getvalue())
-                    if res:
-                        st.session_state["classification_results"][f.name] = res
-                        # temporarily save files to session to use later
-                        st.session_state[f"file_data_{f.name}"] = f.getvalue()
+        progress = st.progress(0)
+        status = st.empty()
+        total = len(uploaded_files)
+        
+        for i, f in enumerate(uploaded_files):
+            if f.name not in st.session_state["classification_results"]:
+                status.info(f"Classifying {i+1}/{total}: **{f.name}**...")
+                res = classify_document(f.name, f.getvalue())
+                if res:
+                    st.session_state["classification_results"][f.name] = res
+                    st.session_state[f"file_data_{f.name}"] = f.getvalue()
+                # Throttle: 5s between calls to stay within free-tier RPM limits
+                if i < total - 1:
+                    import time
+                    time.sleep(5)
+            progress.progress((i + 1) / total)
+        
+        status.success("Classification complete!")
     
     if st.session_state["classification_results"]:
         st.subheader("Classification Results")
