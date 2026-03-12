@@ -1,0 +1,10 @@
+LTV_THRESHOLDS:
+  Real Estate: 70
+  Plant & Machinery: 50
+  FD: 90
+  Stocks: 40
+
+PD_THRESHOLDS:
+  High_Risk: 0.15
+  Medium_Risk: 0.05
+  Low_Risk: 0.01
