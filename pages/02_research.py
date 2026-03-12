@@ -11,29 +11,44 @@ from utils.web_scraper import gather_web_context
 from utils.triangulation import triangulate_research_vs_documents
 from utils.research_agent import generate_research_report
 
-st.set_page_config(page_title="Module 2 - Research Agent", layout="wide")
+# ── Page config ───────────────────────────────────────────────────────────────
+st.set_page_config(page_title="Module 2 — Research Agent", layout="wide")
 
-st.title("Module 2 — Research Agent")
-st.markdown("This module reads the output of Module 1 and enriches it with external intelligence and loan officer field notes.")
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+.stApp { background: #f8fafc; }
+h1,h2,h3,h4 { color: #1B3A6B; }
+.stButton > button { background:#1B3A6B!important;color:white!important;border-radius:7px!important;font-weight:600!important; }
+.stButton > button:hover { background:#2563EB!important; }
+</style>
+""", unsafe_allow_html=True)
 
-if "extraction_payload" not in st.session_state:
-    try:
-        with open("./data/extraction_payload.json", "r") as f:
-            st.session_state["extraction_payload"] = json.load(f)
-        st.info("Session restored from saved extraction data.")
-    except FileNotFoundError:
-        st.error("Please complete Step 1 (Entity & Documents) first.")
-        st.markdown(
-            """
-            <a href="/" target="_self">
-                <button style="border: 1px solid #ddd; border-radius: 5px; padding: 0.5rem 1rem; cursor: pointer; background: transparent;">
-                    ← Go to Step 1
-                </button>
-            </a>
-            """,
-            unsafe_allow_html=True
-        )
-        st.stop()
+# ── STEP 1: Session persistence ───────────────────────────────────────────────
+def load_payload(name: str, filepath: str, required_step: int):
+    if name not in st.session_state:
+        try:
+            with open(filepath) as f:
+                st.session_state[name] = json.load(f)
+            st.info(f"Session restored from {filepath}")
+        except FileNotFoundError:
+            st.warning(f"⚠ {name} not found. Please complete Step {required_step} first.")
+            if st.button(f"← Go to Step {required_step}"):
+                st.switch_page(f"pages/0{required_step}_{'ingestor' if required_step==1 else 'research'}.py")
+            st.stop()
+
+load_payload("extraction_payload", "./data/extraction_payload.json", 1)
+
+# ── Step progress bar ─────────────────────────────────────────────────────────
+steps_done = sum([
+    "extraction_payload" in st.session_state,
+    "research_payload"   in st.session_state,
+    "recommendation_payload" in st.session_state,
+])
+st.title("🔍 Module 2 — Research Agent")
+st.progress(steps_done / 4, text=f"Pipeline: {steps_done}/4 modules complete")
+st.divider()
 
 extraction = st.session_state["extraction_payload"]
 entity = extraction.get("entity_context", {})
@@ -181,3 +196,12 @@ if 'research_report' in st.session_state:
             
         st.success("Research profile confirmed and saved. Proceeding to risk summary...")
         st.balloons()
+        
+        st.divider()
+        n1, n2 = st.columns(2)
+        with n1:
+            if st.button("← Back to Module 1"):
+                st.switch_page("pages/01_ingestor.py")
+        with n2:
+            if st.button("Proceed to Step 3 →"):
+                st.switch_page("pages/03_recommendation.py")

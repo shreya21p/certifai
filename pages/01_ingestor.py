@@ -14,15 +14,18 @@ from utils.docling_parser import parse_document
 from utils.schema_editor import render_schema_editor
 from utils.fraud_engine import detect_revenue_anomalies
 
-# Config
-st.set_page_config(page_title="Module 1 - Ingestor", layout="wide")
+# ── Page config ───────────────────────────────────────────────────────────────
+st.set_page_config(page_title="Module 1 — Ingestor", layout="wide")
 
 st.markdown("""
-    <style>
-    .stApp { background-color: #f8f9fa; }
-    .stButton>button { background-color: #1B3A6B; color: white; border-radius: 5px; }
-    h1, h2, h3, h4 { color: #1B3A6B; }
-    </style>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+.stApp { background: #f8fafc; }
+h1,h2,h3,h4 { color: #1B3A6B; }
+.stButton > button { background:#1B3A6B!important;color:white!important;border-radius:7px!important;font-weight:600!important; }
+.stButton > button:hover { background:#2563EB!important; }
+</style>
 """, unsafe_allow_html=True)
 
 # Data Models
@@ -51,15 +54,27 @@ if "extraction_results" not in st.session_state:
 if "final_extraction" not in st.session_state:
     st.session_state["final_extraction"] = {}
 
-# Check for existing session payload
-if "extraction_payload" not in st.session_state:
-    if os.path.exists("data/extraction_payload.json"):
+# ── STEP 1: Session persistence ───────────────────────────────────────────────
+def load_payload(name: str, filepath: str):
+    if name not in st.session_state:
         try:
-            with open("data/extraction_payload.json", "r") as f:
-                st.session_state["extraction_payload"] = json.load(f)
-            st.info("Session restored from saved file.")
-        except Exception:
+            with open(filepath) as f:
+                st.session_state[name] = json.load(f)
+            st.info(f"Session restored from {filepath}")
+        except FileNotFoundError:
             pass
+
+load_payload("extraction_payload", "./data/extraction_payload.json")
+
+# ── Step progress bar ─────────────────────────────────────────────────────────
+steps_done = sum([
+    "extraction_payload" in st.session_state,
+    "research_payload"   in st.session_state,
+    "recommendation_payload" in st.session_state,
+])
+st.title("📂 Module 1 — Ingestor & Data Extractor")
+st.progress(steps_done / 4, text=f"Pipeline: {steps_done}/4 modules complete")
+st.divider()
 
 
 def render_step_1():
@@ -477,15 +492,12 @@ def render_step_5():
             
         st.success("Extraction complete! Payload saved to ./data/extraction_payload.json")
         st.json(payload)
+        
+        if st.button("Proceed to Step 2 →", use_container_width=True):
+            st.switch_page("pages/02_research.py")
 
 
 def main():
-    st.title("Intelli-Credit: Corporate Underwriting Pipeline")
-    
-    # Progress bar
-    st.progress(st.session_state["step"] / 5.0)
-    st.caption(f"Step {st.session_state['step']} of 5")
-    
     if st.session_state["step"] == 1:
         render_step_1()
     elif st.session_state["step"] == 2:

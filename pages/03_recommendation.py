@@ -86,19 +86,32 @@ st.markdown("""
 # ─────────────────────────────────────────────────────────────────────────────
 os.makedirs("data", exist_ok=True)
 
-for payload_name, filepath in [
-    ("extraction_payload", "./data/extraction_payload.json"),
-    ("research_payload",   "./data/research_payload.json"),
-]:
-    if payload_name not in st.session_state:
+# ── STEP 1: Session persistence ───────────────────────────────────────────────
+def load_payload(name: str, filepath: str, required_step: int):
+    if name not in st.session_state:
         try:
             with open(filepath) as f:
-                st.session_state[payload_name] = json.load(f)
-            st.info(f"✅ Restored **{payload_name}** from saved file.")
+                st.session_state[name] = json.load(f)
+            st.info(f"Session restored from {filepath}")
         except FileNotFoundError:
-            step = 1 if "extraction" in payload_name else 2
-            st.error(f"⚠️ Please complete **Module {step}** first — `{filepath}` not found.")
+            st.warning(f"⚠ {name} not found. Please complete Step {required_step} first.")
+            if st.button(f"← Go to Step {required_step}"):
+                st.switch_page(f"pages/0{required_step}_{'ingestor' if required_step==1 else 'research' if required_step==2 else 'recommendation'}.py")
             st.stop()
+
+load_payload("extraction_payload", "./data/extraction_payload.json", 1)
+load_payload("research_payload",   "./data/research_payload.json", 2)
+
+# ── Step progress bar ─────────────────────────────────────────────────────────
+steps_done = sum([
+    "extraction_payload" in st.session_state,
+    "research_payload"   in st.session_state,
+    "recommendation_payload" in st.session_state,
+])
+st.title("🏦 Module 3 — Recommendation Engine")
+st.progress(steps_done / 4, text=f"Pipeline: {steps_done}/4 modules complete")
+st.caption(f"Evaluating **{company_name}** | Sector: {sector} | Loan: ₹{loan_amount:.1f} Cr")
+st.divider()
 
 extraction_payload: dict = st.session_state["extraction_payload"]
 research_payload:   dict = st.session_state["research_payload"]
@@ -119,8 +132,7 @@ loan_amount  = float(entity.get("loan_amount") or entity.get("loan_amount_cr") o
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE HEADER
 # ─────────────────────────────────────────────────────────────────────────────
-st.title("🏦 Intelli-Credit: Module 3 — Recommendation Engine")
-st.caption(f"Evaluating **{company_name}** | Sector: {sector} | Loan: ₹{loan_amount:.1f} Cr")
+# DELETED OLD HEADER
 st.divider()
 
 tab1, tab2 = st.tabs(["📊 Credit Risk Engine", "🔬 Forensic Dashboard"])
@@ -866,6 +878,15 @@ with tab2:
 
     # ── Footer ───────────────────────────────────────────────────────────────
     st.divider()
+    
+    n1, n2 = st.columns(2)
+    with n1:
+        if st.button("← Back to Module 2"):
+            st.switch_page("pages/02_research.py")
+    with n2:
+        if st.button("Proceed to Step 4 →"):
+            st.switch_page("pages/04_cam.py")
+
     st.caption(
         f"📁 Recommendation payload saved → `./data/recommendation_payload.json` | "
         f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"

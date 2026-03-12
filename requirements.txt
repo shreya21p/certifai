@@ -1,35 +1,41 @@
+# Intelli-Credit — Full requirements
 # Core framework
-streamlit==1.54.0
+streamlit>=1.35.0
 ddgs
 
 # AI / LLM
-google-genai==1.66.0
+google-genai>=1.0.0
 
 # Document parsing
-docling==2.78.0
-docling-core==2.69.0
-docling-ibm-models==3.12.0
-docling-parse==5.5.0
+docling>=2.78.0
+docling-core>=2.69.0
+docling-ibm-models>=3.12.0
+docling-parse>=5.5.0
 
 # Data handling
-pandas==2.2.3
-openpyxl==3.1.5
+pandas>=2.0.0
+openpyxl>=3.1.0
 
 # Schema / validation
-pydantic==2.12.5
-pydantic-settings==2.13.1
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
 
 # Environment
-python-dotenv==1.1.1
+python-dotenv>=1.0.0
 
 # Visualization
-plotly==6.5.2
+plotly>=5.20.0
+matplotlib>=3.8.0
 
 # Image processing
-pillow==11.1.0
+pillow>=10.0.0
+
+# CAM export
+reportlab>=4.0.0
+python-docx>=1.1.0
 
 # Credit engine / policy
-pyyaml
+pyyaml>=6.0.0
 
 # Entity relationship graph
-streamlit-agraph
+streamlit-agraph>=0.0.45
