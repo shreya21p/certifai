@@ -27,3 +27,9 @@ plotly==6.5.2
 
 # Image processing
 pillow==11.1.0
+
+# Credit engine / policy
+pyyaml
+
+# Entity relationship graph
+streamlit-agraph
