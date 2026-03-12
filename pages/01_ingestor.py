@@ -1,4 +1,5 @@
 import streamlit as st
+st.set_page_config(page_title="Module 1 — Ingestor", layout="wide")
 import pandas as pd
 import json
 import os
@@ -16,7 +17,6 @@ from utils.fraud_engine import detect_revenue_anomalies
 from utils.ui_icons import svg_header, get_svg, icon_label
 
 # ── Page config ───────────────────────────────────────────────────────────────
-st.set_page_config(page_title="Module 1 — Ingestor", layout="wide")
 
 st.markdown("""
 <style>

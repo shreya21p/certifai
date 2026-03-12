@@ -10,12 +10,12 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import pandas as pd
 import streamlit as st
+st.set_page_config(page_title="Module 4 — CAM Generator", layout="wide")
 
 from utils.gemini_client import call_gemini_with_retry
 from utils.ui_icons import svg_header, get_svg, icon_label
 
 # ── Page config ───────────────────────────────────────────────────────────────
-st.set_page_config(page_title="Module 4 — CAM Generator", layout="wide")
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');

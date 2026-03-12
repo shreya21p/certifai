@@ -1,4 +1,6 @@
 import streamlit as st
+st.set_page_config(page_title="Module 2 — Research Agent", layout="wide")
+
 import json
 import sys
 import os
@@ -11,9 +13,6 @@ from utils.web_scraper import gather_web_context
 from utils.triangulation import triangulate_research_vs_documents
 from utils.research_agent import generate_research_report
 from utils.ui_icons import svg_header, get_svg, icon_label
-
-# ── Page config ───────────────────────────────────────────────────────────────
-st.set_page_config(page_title="Module 2 — Research Agent", layout="wide")
 
 st.markdown("""
 <style>

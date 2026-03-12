@@ -615,7 +615,7 @@ with st.sidebar:
                 f"📄 **CAM Version:** {last['version']}  \n"
                 f"🕐 {last['timestamp'][:16].replace('T', ' ')}"
             )
-            if st.button("View Version History", icon=":material/history"):
+            if st.button("View Version History", icon=":material/history:"):
                 st.session_state["show_version_history"] = True
     except (FileNotFoundError, json.JSONDecodeError, KeyError):
         pass

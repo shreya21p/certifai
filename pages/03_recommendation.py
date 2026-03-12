@@ -9,6 +9,7 @@ from datetime import datetime
 
 import plotly.graph_objects as go
 import streamlit as st
+st.set_page_config(page_title="Module 3 — Recommendation Engine", layout="wide")
 
 from utils.credit_engine import CreditEngine
 from utils.gemini_client import call_gemini_with_retry
@@ -17,7 +18,6 @@ from utils.ui_icons import svg_header, get_svg, icon_label
 # ─────────────────────────────────────────────────────────────────────────────
 # Page config
 # ─────────────────────────────────────────────────────────────────────────────
-st.set_page_config(page_title="Module 3 — Recommendation Engine", layout="wide")
 
 st.markdown("""
     <style>
