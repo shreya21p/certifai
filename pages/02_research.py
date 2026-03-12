@@ -195,13 +195,4 @@ if 'research_report' in st.session_state:
             json.dump(st.session_state["research_payload"], f, indent=4)
             
         st.success("Research profile confirmed and saved. Proceeding to risk summary...")
-        st.balloons()
-        
-        st.divider()
-        n1, n2 = st.columns(2)
-        with n1:
-            if st.button("← Back to Module 1"):
-                st.switch_page("pages/01_ingestor.py")
-        with n2:
-            if st.button("Proceed to Step 3 →"):
-                st.switch_page("pages/03_recommendation.py")
+        st.switch_page("pages/03_recommendation.py")

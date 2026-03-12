@@ -1,20 +1,143 @@
 {
     "decision": "APPROVE",
-    "recommended_loan_cr": 17.15,
-    "recommended_rate_pct": 13.29,
-    "pd": 0.284,
+    "recommended_loan_cr": 9.06,
+    "recommended_rate_pct": 14.15,
+    "pd": 0.39,
     "lgd": 0.05,
-    "z_score": 1.896,
-    "confidence": 0.75,
-    "decision_rationale": [],
-    "swot": {},
-    "five_cs": {},
-    "conditions": [],
+    "z_score": 1.828,
+    "confidence": 0.85,
+    "decision_rationale": [
+        "The credit model recommends an 'APPROVE' decision with 85% confidence, providing a foundational basis for considering the loan.",
+        "Despite a high Probability of Default (39.0%) and an Altman Z-Score in the 'Grey' zone (1.828), the exceptionally low Loss Given Default (5.0%) is a crucial mitigating factor, indicating strong recovery prospects and/or robust collateral coverage.",
+        "The requested loan amount of \u20b912.0Cr significantly exceeds the Max Recommended Loan of \u20b99.06Cr by the model, necessitating a reduction to manage exposure prudently.",
+        "Multiple critical and high-severity Early Warning Signals and triangulation flags, primarily related to promoter character, transparency, and legal compliance, demand the imposition of stringent covenants and enhanced monitoring.",
+        "The recommended interest rate of 14.15% appropriately prices the elevated risk profile identified, ensuring adequate compensation for the bank."
+    ],
+    "swot": {
+        "strengths": [
+            "Very low Loss Given Default (5.0%) indicates strong asset coverage and high potential recovery in case of default.",
+            "Good RBI/GST Compliance Score (1.0) suggests adherence to key regulatory requirements.",
+            "The model's high confidence (85%) in an 'APPROVE' decision, despite quantitative risks, implies underlying operational stability or asset quality."
+        ],
+        "weaknesses": [
+            "Altman Z-Score of 1.828 placing the company in the 'Grey' zone, signaling elevated risk of financial distress.",
+            "High Probability of Default (39.0%) indicates significant credit risk.",
+            "Promoter evasiveness and critical legal data discrepancies raise serious concerns about character and transparency.",
+            "Requested loan amount (\u20b912.0Cr) substantially exceeds the Max Recommended Loan (\u20b99.06Cr).",
+            "Delayed MCA filing and 'Minor Issues' reported in CIBIL Commercial Score highlight compliance and credit history concerns."
+        ],
+        "opportunities": [
+            "Opportunity to improve corporate governance and financial transparency by adhering to bank's stringent conditions and monitoring.",
+            "Access to capital (at a reduced amount) to potentially enhance operational efficiency or support essential working capital needs.",
+            "Strengthening the company's relationship with the bank by proactively addressing identified risk areas."
+        ],
+        "threats": [
+            "Active e-Courts litigation could lead to unforeseen financial liabilities or operational disruptions.",
+            "Reputational damage due to promoter's lack of candor and legal data discrepancies.",
+            "Potential regulatory penalties and operational hurdles resulting from delayed MCA filings.",
+            "Increased cost of borrowing due to the high recommended interest rate (14.15%) impacting profitability."
+        ]
+    },
+    "five_cs": {
+        "character": {
+            "score": 2,
+            "comment": "Significant concerns are noted regarding promoter evasiveness on an existing pledge, critical legal data mismatch, and delayed MCA filings. These indicators collectively point to potential issues with transparency, integrity, and adherence to regulatory obligations."
+        },
+        "capacity": {
+            "score": 2,
+            "comment": "Capacity is weak, evidenced by a 'Grey' Altman Z-Score and a high Probability of Default. The presence of an active e-Courts case poses a direct threat to cash flow and operational stability. 'Minor Issues' in the CIBIL score further suggest underlying financial stress."
+        },
+        "capital": {
+            "score": 3,
+            "comment": "While specific capital ratios are not provided, the 'Grey' Altman Z-Score implies some pressure on the capital structure. The promoter's pledge issue suggests potential leveraging concerns at the group level, which could impact the company's financial resilience."
+        },
+        "collateral": {
+            "score": 5,
+            "comment": "Outstanding strength in collateral, as indicated by an exceptionally low Loss Given Default (5.0%). This suggests robust asset backing and a high probability of recovery in the event of default, significantly mitigating the bank's exposure."
+        },
+        "conditions": {
+            "score": 3,
+            "comment": "The manufacturing sector in India generally offers a stable operating environment. However, the internal conditions of Raj Textiles, marked by various compliance and transparency issues, necessitate the imposition of rigorous terms and enhanced monitoring to manage the associated risks."
+        }
+    },
+    "conditions": [
+        "Loan amount to be strictly capped at \u20b99.06Cr, aligning with the maximum recommended by the credit model.",
+        "Borrower must submit a comprehensive court clearance certificate for all active and historical e-Courts cases within 30 days of loan sanction.",
+        "Satisfactory evidence of resolution regarding the RKA Holdings pledge with Kotak Bank must be provided, along with an undertaking not to create any further encumbrances on promoter shareholdings without prior written consent from the bank.",
+        "All pending MCA filings must be completed within 15 days, and an undertaking for strict future compliance with all regulatory filings is required.",
+        "A detailed explanation and remediation plan for the 'Minor Issues' identified in the CIBIL Commercial score must be submitted within 30 days.",
+        "Enhanced quarterly financial reporting, including detailed cash flow statements, and mandatory bi-annual site visits by bank officials.",
+        "Personal guarantees from all key promoters, given the concerns around character and capacity, shall be a pre-disbursement condition."
+    ],
     "rejection_reason": null,
-    "india_specific_concerns": [],
-    "fraud_score": 0,
-    "fraud_flags": [],
-    "triangulation_flags": [],
-    "early_warning_signals": [],
-    "recommendation_timestamp": "2026-03-12T16:20:58.690590"
+    "india_specific_concerns": [
+        "One active e-Courts litigation record against the company, which can lead to financial liabilities or operational disruptions.",
+        "Delayed MCA filing (362 days old), indicating potential non-compliance with Indian corporate governance standards and regulatory penalties.",
+        "CIBIL Commercial Score flagged with 'Minor Issues', necessitating a deeper dive into the company's credit history within the Indian financial ecosystem.",
+        "Promoter's evasiveness regarding a pledge with an Indian bank (Kotak) raises concerns about transparency and potential group-level financial stress.",
+        "A triangulation flag indicating a mismatch between web-based legal information and submitted documents (LEGAL_SIGNAL_DOCUMENT_MISMATCH), highlighting a transparency gap specific to legal data in India."
+    ],
+    "fraud_score": 18,
+    "fraud_flags": [
+        {
+            "flag": "MCA_FILING_DELAYED",
+            "severity": "MEDIUM",
+            "detail": "MCA filing is 362 days old \u2014 approaching annual deadline.",
+            "five_c": "Character"
+        }
+    ],
+    "triangulation_flags": [
+        {
+            "flag": "LEGAL_SIGNAL_DOCUMENT_MISMATCH",
+            "severity": "HIGH",
+            "detail": "Web sources mention legal keywords: ['nclt', 'insolvency', 'court'] \u2014 but no legal flags found in uploaded documents. Request court clearance certificate from borrower.",
+            "source": "TRIANGULATION",
+            "five_c": "Character"
+        }
+    ],
+    "early_warning_signals": [
+        {
+            "signal": "Promoter evasiveness on RKA Holdings pledge with Kotak",
+            "severity": "CRITICAL",
+            "source": "PRIMARY",
+            "detail": "MD Mr. Rajesh Kumar Agarwal was 'slightly evasive' regarding the RKA Holdings pledge with Kotak, stating it's a 'temporary arrangement being resolved.' This suggests potential liquidity stress or leveraging concerns at the promoter level.",
+            "five_c_mapping": "Character"
+        },
+        {
+            "signal": "Active e-Courts litigation record found",
+            "severity": "HIGH",
+            "source": "PRIMARY",
+            "detail": "Primary field notes confirm 'e-Courts Cases Found: 1', indicating active legal proceedings against Raj Textiles, which can lead to financial liabilities or operational disruptions.",
+            "five_c_mapping": "Capacity"
+        },
+        {
+            "signal": "Triangulation flag: Legal data mismatch between web and documents",
+            "severity": "CRITICAL",
+            "source": "TRIANGULATION",
+            "detail": "The `LEGAL_SIGNAL_DOCUMENT_MISMATCH` flag indicates web sources mention legal keywords but no corresponding legal flags in uploaded documents, suggesting a potential gap in transparency or data verification. A court clearance certificate is recommended.",
+            "five_c_mapping": "Character"
+        },
+        {
+            "signal": "Delayed MCA filing approaching annual deadline",
+            "severity": "MEDIUM",
+            "source": "MCA",
+            "detail": "An existing fraud flag highlights an `MCA_FILING_DELAYED` of 362 days, nearing the annual deadline. This non-compliance can result in penalties and potential director disqualification.",
+            "five_c_mapping": "Character"
+        },
+        {
+            "signal": "CIBIL Commercial score with 'Minor Issues'",
+            "severity": "MEDIUM",
+            "source": "FINANCIAL",
+            "detail": "While the CIBIL Commercial score is 7.0, primary notes mention 'Minor Issues'. This warrants further investigation into the nature and impact of these issues on the company's creditworthiness.",
+            "five_c_mapping": "Capacity"
+        },
+        {
+            "signal": "Lack of clear promoter succession plan",
+            "severity": "MEDIUM",
+            "source": "PRIMARY",
+            "detail": "The MD has not discussed a succession plan, with his 24-year-old son reportedly being groomed for an operations role. This poses a long-term key-man and management transition risk.",
+            "five_c_mapping": "Character"
+        }
+    ],
+    "recommendation_timestamp": "2026-03-12T17:09:20.485857"
 }

@@ -1,23 +1,109 @@
 {
-  "research_output": {
-    "composite_external_risk_score": 4.2,
-    "legal_risk_score": 2.0,
-    "operational_risk_score": 3.0,
-    "mca_risk_score": 1.5,
-    "gst_compliance_score": 2.0,
-    "sector_risk_score": 3.5,
-    "sector_summary": "Indian auto-component manufacturing is seeing strong demand driven by EV transition and PLI schemes. Mid-sized players with domestic exposure well-positioned.",
-    "early_warning_signals": [],
-    "news_summary": "No adverse news found for ABC Manufacturing Pvt Ltd. Company featured in ET for production expansion in Q2 FY25."
-  },
-  "primary_insights": {
-    "factory_capacity_pct": 82,
-    "management_quality": "Good",
-    "cibil_commercial_verified": "Yes \u2014 Clean",
-    "ecourt_cases_found": 0,
-    "rbi_compliance": "Fully Compliant",
-    "mca_last_filing_date": "2024-09-15"
-  },
-  "triangulation_flags": [],
-  "research_timestamp": "2026-03-12T16:17:31.322428"
+    "research_output": {
+        "news_risk_score": 1.0,
+        "legal_risk_score": 8.0,
+        "sector_risk_score": 1.0,
+        "operational_risk_score": 1.0,
+        "promoter_risk_score": 5.0,
+        "mca_risk_score": 5.0,
+        "gst_compliance_score": 1.0,
+        "news_summary": "News intelligence reveals a largely positive outlook for the broader textile and apparel sector in Rajasthan, driven by new government policies like the Rajasthan Textile and Apparel Policy 2025 aimed at attracting significant investments (e.g., US $4.6 billion) and creating jobs. Events like BharatTex 2025 also indicate sectoral growth. No direct negative news, management changes, fraud allegations, or regulatory actions were found specifically against 'Raj Textiles' (CIN: U17111MH2016PTC283456). A reported fire at 'Raj Textile Market in Surat' is identified as a market event and not directly linked to the subject company.",
+        "legal_summary": "Primary field notes indicate the presence of 1 e-Courts case, signaling active litigation against Raj Textiles. This is a direct legal risk. Furthermore, a critical triangulation flag highlights a discrepancy: while web sources mention general legal keywords like 'nclt', 'insolvency', and 'court', no specific legal flags were found in the uploaded documents. This suggests a potential gap in documented legal disclosures, prompting a recommendation for a court clearance certificate from the borrower to ascertain the full extent of legal exposure.",
+        "sector_summary": "The manufacturing sector in India, particularly textiles, is experiencing positive momentum. Government initiatives, GST rate cuts, and ambitious state policies (like Rajasthan Textile and Apparel Policy 2025) are driving investments and growth. While general structural headwinds in supply chains and MSME finance are noted for 2026, the overall sector outlook for FY25-26 remains robust and supportive of business operations.",
+        "promoter_summary": "MD Mr. Rajesh Kumar Agarwal is articulate and well-informed, providing a satisfactory explanation for SBI CC irregularities. However, he was 'slightly evasive' regarding an RKA Holdings pledge with Kotak, describing it as a 'temporary arrangement being resolved.' This evasiveness around promoter-level leveraging is a significant concern. While the promoter has 8 years of industry experience, the absence of a formal succession plan, with his 24-year-old son reportedly being groomed for an operational role, presents a long-term management transition risk. Note: There is a potential discrepancy between 'Mr. Rajesh Kumar Agarwal' (primary notes) and 'Rajkumar Satyanarayan Agarwal' (web intelligence) for the MD.",
+        "operational_summary": "Operational performance appears strong, with 72% factory capacity utilization and 3 out of 4 weaving units operational. The company is actively expanding with 8 new shuttle-less looms partially installed and expected to be commissioned by June 2025. Raw cotton inventory is adequate for ~45 days, and the finished goods warehouse is at 60% capacity. The plant and machinery are well-maintained, and there are no signs of labor unrest. Management quality is rated 'Good,' RM rating is 'Positive,' and account conduct is 'Satisfactory.'",
+        "mca_summary": "An existing fraud flag, `MCA_FILING_DELAYED`, indicates a medium severity risk due to the MCA filing being 362 days old and approaching the annual deadline. This signifies that the company is not current on its ROC filings, exposing it to potential penalties and director disqualification under Section 164(2) of the Companies Act, 2013, as highlighted in web intelligence.",
+        "gst_compliance_summary": "GST compliance is strong as evidenced by a 'None%' variance between GSTR-2A and GSTR-3B. This indicates accurate Input Tax Credit (ITC) claims and regular, timely reconciliation of purchase invoices, mitigating risks associated with ITC mismatches or fake invoices.",
+        "early_warning_signals": [
+            {
+                "signal": "Promoter evasiveness on RKA Holdings pledge with Kotak",
+                "severity": "CRITICAL",
+                "source": "PRIMARY",
+                "detail": "MD Mr. Rajesh Kumar Agarwal was 'slightly evasive' regarding the RKA Holdings pledge with Kotak, stating it's a 'temporary arrangement being resolved.' This suggests potential liquidity stress or leveraging concerns at the promoter level.",
+                "five_c_mapping": "Character"
+            },
+            {
+                "signal": "Active e-Courts litigation record found",
+                "severity": "HIGH",
+                "source": "PRIMARY",
+                "detail": "Primary field notes confirm 'e-Courts Cases Found: 1', indicating active legal proceedings against Raj Textiles, which can lead to financial liabilities or operational disruptions.",
+                "five_c_mapping": "Capacity"
+            },
+            {
+                "signal": "Triangulation flag: Legal data mismatch between web and documents",
+                "severity": "CRITICAL",
+                "source": "TRIANGULATION",
+                "detail": "The `LEGAL_SIGNAL_DOCUMENT_MISMATCH` flag indicates web sources mention legal keywords but no corresponding legal flags in uploaded documents, suggesting a potential gap in transparency or data verification. A court clearance certificate is recommended.",
+                "five_c_mapping": "Character"
+            },
+            {
+                "signal": "Delayed MCA filing approaching annual deadline",
+                "severity": "MEDIUM",
+                "source": "MCA",
+                "detail": "An existing fraud flag highlights an `MCA_FILING_DELAYED` of 362 days, nearing the annual deadline. This non-compliance can result in penalties and potential director disqualification.",
+                "five_c_mapping": "Character"
+            },
+            {
+                "signal": "CIBIL Commercial score with 'Minor Issues'",
+                "severity": "MEDIUM",
+                "source": "FINANCIAL",
+                "detail": "While the CIBIL Commercial score is 7.0, primary notes mention 'Minor Issues'. This warrants further investigation into the nature and impact of these issues on the company's creditworthiness.",
+                "five_c_mapping": "Capacity"
+            },
+            {
+                "signal": "Lack of clear promoter succession plan",
+                "severity": "MEDIUM",
+                "source": "PRIMARY",
+                "detail": "The MD has not discussed a succession plan, with his 24-year-old son reportedly being groomed for an operations role. This poses a long-term key-man and management transition risk.",
+                "five_c_mapping": "Character"
+            }
+        ],
+        "triangulation_flags": [
+            {
+                "flag": "LEGAL_SIGNAL_DOCUMENT_MISMATCH",
+                "severity": "HIGH",
+                "detail": "Web sources mention legal keywords: ['nclt', 'insolvency', 'court'] \u2014 but no legal flags found in uploaded documents. Request court clearance certificate from borrower.",
+                "source": "TRIANGULATION",
+                "five_c": "Character"
+            }
+        ],
+        "india_specific_flags": [
+            "GSTR-2A vs 3B: No discrepancy ('None%' variance), signaling good compliance and accurate Input Tax Credit (ITC) claims.",
+            "CIBIL Commercial: Score is 7.0, but primary notes indicate 'Minor Issues', which requires further investigation into their nature and potential impact.",
+            "MCA Filing: The company is not current on ROC filings, with the last filing on 2025-03-15, which is 362 days old and approaching the annual deadline.",
+            "e-Courts: There is 1 active litigation record found against the company in e-Courts.",
+            "RBI Circular Compliance: The company is Fully Compliant with RBI circulars."
+        ],
+        "composite_external_risk_score": 7.0,
+        "research_confidence": 0.9
+    },
+    "triangulation_flags": [
+        {
+            "flag": "LEGAL_SIGNAL_DOCUMENT_MISMATCH",
+            "severity": "HIGH",
+            "detail": "Web sources mention legal keywords: ['nclt', 'insolvency', 'court'] \u2014 but no legal flags found in uploaded documents. Request court clearance certificate from borrower.",
+            "source": "TRIANGULATION",
+            "five_c": "Character"
+        }
+    ],
+    "primary_insights": {
+        "factory_capacity_pct": 72,
+        "management_quality": "Good",
+        "site_visit_notes": "Factory visited on 08-Mar-2025. 3 out of 4 weaving units operational. \nNew shuttle-less looms (8 units) partially installed \u2014 commissioning \nexpected by Jun-2025. Raw cotton inventory levels adequate for ~45 days. \nFinished goods warehouse at 60% capacity. Workers present, no signs of \nlabour unrest. Plant & machinery well-maintained. Expansion area demarcated \nwith civil work in progress.",
+        "management_interview_notes": "MD Mr. Rajesh Kumar Agarwal was present. Articulate and well-informed about \nindustry dynamics. Provided satisfactory explanation for SBI CC irregularities \n\u2014 attributed to GST payment timing mismatch in Q2 FY24. Slightly evasive when \nasked about the RKA Holdings pledge with Kotak \u2014 said \"it's a temporary \narrangement being resolved.\" Promoter has 8 years in the textile industry. \nNo succession plan discussed. Son (age 24) reportedly being groomed for \noperations role.",
+        "rm_rating": "Positive",
+        "account_conduct": "Satisfactory",
+        "cibil_commercial_verified": "Yes \u2014 Minor Issues",
+        "ecourt_cases_found": 1,
+        "rbi_compliance": "Fully Compliant"
+    },
+    "web_context_used": {
+        "news_context": "Rajasthan Textile And Apparel Policy 2025: Rajasthan eyes big .... Jan 16, 2026 \u00b7At present, more than 1,800textileand apparel units are operational inRajasthan. In2024\u201325, the state\u2019stextilesector exports increased to \u20b913,500 crore. Secretary, Ministry ofTextiles, Neelam Shami Rao, said thatRajasthanhas potential in new-age fibres. | India: Rajasthan unveils new textile and apparel state policy .... Feb 7,2025\u00b7TheRajasthanCabinet chaired by Chief Minister Bhajanlal Sharma has approved a newtextileand apparel policy. With a possible investment of over US $ 4.6 billion (Rs. 40,000 crore) in the state, this strategy will help the state\u2019stextileproducers and provide new job possibilities. | Major Fire Erupts At Raj Textile Market In Surat; No ... - News18. Dec 10,2025\u00b7A major fire erupted atRajTextileMarket in Surat\u2019s Parvat Patiya around 7 a.m., prompting a swift emergency response. No casualties reported as the market was mostly empty. | BharatTex 2025 \u2013 Bhilwara Roadshow organized in Bhilwara .... Feb 6, 2026 \u00b7The event witnessed the participation of over 100 key stakeholders fromRajasthan\u2019stextilevalue chain, marking a significant step towards the highly anticipated BharatTex2025. | Rajasthan Rolls Out Rs 10,000 Cr Textile Policy To Boost Jobs .... Apr 17,2025\u00b7In a major policy push to position Rajasthan as a leading textile manufacturing hub, the state government has announced theRajasthanTextileand Apparel Policy2025. The comprehensive policy aims to attract investments worth Rs 10,000 crore and create up to two lakh new jobs over the next five years, while fostering inclusive, sustainable growth | TEXTILES - rising.rajasthan.gov.in. Indiais 2nd largest consumer of cotton in the world.Indiais also the 2nd largest producer of silk in the world and 95% of the world's hand-woven fabric comes fromIndia. | Rajasthan Textile and Apparel Policy 2025: A Structured Push .... Jun 6,2025\u00b7The Government of Rajasthan has introduced theRajasthanTextileand Apparel Policy2025to support the growth of the textile and apparel sector through targeted investments, infrastructure... | RajTextiles| LinkedIn. RajTextiles.TextileManufacturing. Surat, Gujarat 32 followers.",
+        "legal_context": "Code of Civil Procedure (India) - Wikipedia. ... related to general principles of jurisdiction whereas the Orders and Rules prescribe procedures and method that govern civil proceedings inIndia... | NCLT - Insolvency and Bankruptcy Board of India. Disclaimer - The Orders/Judgments of judicial authorities as available on the website of the Insolvency and Bankruptcy Board ofIndia(IBBI) are received from various sources and the IBBI does not authenticate the contents of these Orders/Judgments. These Orders/Judgments are not certified copies issued by the judicial authorities. The Orders/Judgments of Courts/Tribunals available on IBBIs ... | NCLT - Welcome to National Company Law Tribunal. \"The Central Government has constituted National Company Law Tribunal (NCLT) under section 408 of the Companies Act, 2013 (18 of 2013) w.e.f. 01st June 2016. In the first phase the Ministry of Corporate Affairs has set up eleven Benches, one Principal Bench at New Delhi and ten other Benches at New Delhi, Ahmedabad, Allahabad, Bengaluru, Chandigarh, Chennai, Guwahati, Hyderabad, Kolkata and ... | Case Number | National Company Law Tribunal - NCLT. Access case status and details for cases filed in the National Company Law Tribunal (NCLT). | PDF Cause List | National Company Law Tribunal - NCLT. Details of work Carried out byNCLTfor renovation of Block-12 CGO Complex, New Delhi Relocation of Scrutiny Bench and Registry Department to Block 12 Objection List Dated 31.12.2025 TO 18.02.2026 Home About Us Cause List Case Status Case History Judgement/Orders By Notification Circulars Right To Information Case Data Overview Careers Display ... | Case No. | National Company Law Tribunal - NCLT. Please check \"Case History\", an alternative option to Track case status, View List of Hearings, Interim Orders, Judgement, Associated Applications etc., if facing any problem while using case statusorjudgement search. | Filing Number | National Company Law Tribunal - NCLT. Please check \"Case History\", an alternative option to Track case status, View List of Hearings, Interim Orders, Judgement, Associated Applications etc., if facing any problem while using case statusorjudgement search. | NCLT. National Company Law Tribunal At New Delhi Wednesday",
+        "sector_context": "India\u2019s Manufacturing Momentum India\u2019s Manufacturing. Just as factories thrive on steady demand and lean costs,India\u2019srecent GST rate cuts arrive as the fuel that keeps themanufacturingengine humming, making goods cheaper for households, inputs lighter forindustries, and growth faster for the economy. | 2025: Ambitious growth meets structural headwinds. Dec 15,2025\u00b7India\u2019smanufacturingmomentum accelerated in2025, but structural gaps in supply chains, AI readiness, and MSME finance will shape 2026 outcomes. The year2025was a defining year for theIndianmanufacturingsector, marked by a policy-driven surge of investment and technological adoption. | Quarterly Industrial Outlook Survey - Reserve Bank of India. Feb 6, 2026 \u00b7Website owned and managed by ReserveBankofIndia. Contact us on helpdoc [at]rbi[dot]org [dot]in. | India: Manufacturing Sector Revival & Playbook for FY25-26. For financial institutions and investors, understanding the interplay of incentives, licensing, and state-central policies is critical to unlock opportunities in themanufacturingsector. This article explores howIndiais driving itsmanufacturingrevival and implications forFY25-26. | Reimagining Manufacturing: India\u2019s Roadmap to Global .... Our vision extends beyond expanding production capacity. It is about building precision, resilience, and sustainability into ourmanufacturingDNA\u2014creating globally competitive \u201cMade inIndia\u201d brands, high-quality jobs, and a deeply inclusive growth model that draws strength from everyIndianstate. | MANUFACTURING - IBEF. Competitive Advantage: The positive developments in themanufacturingsector, driven by production capacity expansion, government policy support, heightened M&A activity, and PE/VC-led investment, are creating a robust pipeline for the country\u2019s sustained economic growth in the years to come.",
+        "promoter_context": "Fabindia - Wikipedia. Now catering to urbanIndiaas well in the coming decade, Fabindia differentiated itself from other government-owned and often subsidized competitors in handloom fabrics and the apparel sector, like KVIC and various state emporiums, by adapting its fabrics and designs to urban tastes. | Raj Textile Industries Pvt Ltd - Company, Directors, Charges .... It operates in the various sectors based in KOLKATA,India. With an authorized capital of \u20b92.00 Cr and a paid-up capital of \u20b920.00 Lakh the company is classified as a Private. | Amit Sharma - President - Raj Textile | LinkedInRaj Manek | Executive Director and Board Member | Messe ...RAJKUMAR SATYANARAYAN AGARWAL MANAGING DIRECTORFabindia - WikipediaRAJ KUMAR AGARWAL | ZaubaCorpRaj Bagaria | Director Profile | The Company Check. RajTextilea leading Manufacture & Exporter of Home Textile and Floor Covering Products based in panipat ( City of Textile) Haryana ,India. We are exporting our products to worldwide since...Dec 22, 2025 \u00b7By showcasingIndia\u2019scapabilities across technical textiles, garment manufacturing, and smart textile solutions, we create opportunities for collaborations, exports, and technology transfer.RajRayon, known for its high-quality man-made fibers and yarn manufacturing, serves as the foundational step in thetextileproduction chain, providing a strong basis for backward integration with SVG FashionsNow catering to urbanIndiaas well in the coming decade, Fabindia differentiated itself from other government-owned and often subsidized competitors in handloom fabrics and the apparel sector, like KVIC and various state emporiums, by adapting its fabrics and designs to urban tastes.Dec 17, 1998 \u00b7RAJKUMAR AGARWAL is adirectorregistered with Ministry of Corporate Affairs. TheirDirectorIdentification Number (DIN) is 01406769.RAJKUMAR AGARWAL is/has been associated with 3 companies.RajBagaria,Director, with 6 companies across 2 industries.RajBagaria has 31 years in corporate governance. HoldsDirectorrole. Currently with 2 companies, including SalesworthIndiaPrivate Limited and Bagaria Ventures Private Limited. | Raj Manek | Executive Director and Board Member | Messe .... Dec 22, 2025 \u00b7By showcasingIndia\u2019scapabilities across technical textiles, garment manufacturing, and smart textile solutions, we create opportunities for collaborations, exports, and technology transfer. | RAJKUMAR SATYANARAYAN AGARWAL MANAGING DIRECTOR. RajRayon, known for its high-quality man-made fibers and yarn manufacturing, serves as the foundational step in thetextileproduction chain, providing a strong basis for backward integration with SVG Fashions",
+        "mca_context": "Consequences of Delay in Annual Filings Under Companies Act, 2013 .... Discover consequences of delayedannualfilingsunder Companies Act, 2013, including penalties anddirectordisqualification. Learn about remedies like condonation of delay and compounding of offenses to rectify non-compliance. | Director Compliance in India: Annual KYC, Disqualification, and .... Complete 2025 guide todirectorcompliance inIndia\u2014annualDIR-3 KYCfiling, DIN activation,disqualificationunder Section 164, and appointment procedures under the Companies Act. | Consequences of Non Filing of Annual Return Under Companies Act, 2013. Annualreturnfilingrequirement imposes penalties and progressive corporate sanctions including winding up anddirectordisqualification. Companies must prepare and file anannualreturnin the prescribed form disclosing prescribed particulars; specified officers must sign it and certain companies require certification by a practising company secretary.Returnsmust be filed within sixty days ... | Understanding the MCA (ROC) Notices: Legal Implications ... - LinkedIn. Penalty - \u20b9100 per day for latefiling.DirectorDisqualification- Under Section 164 (2), if a company fails to file financial statements for three consecutive years, itsdirectorsare ... | Case Law: Whether Non-Filing of 3 year Annual Form Automatically .... Union ofIndia(2023) has significant implications for companydirectorsinIndia, particularly concerningdisqualificationunder Section 164 (2) of the Companies Act, 2013. This judgment reinforces the automatic nature ofdirectordisqualificationdue to non-compliance and highlights the legal principles governing thedisqualificationprocess.",
+        "gst_context": "WhyGSTNoticesAre Issued: 10 Common Mistakes Taxpayers Make. 9. LateGSTRegistration. Businesses must register forGSTonce their turnover crosses the threshold limit. If a business crosses the prescribed limit but registers late, the department may send anoticeand ask fortaxfrom the earlier date. 10.FakeInvoice Alerts. | How to Respond to DRC-01CNoticeforITCMismatch:GSTR-2B vs..... A. Some of the reasons for themismatchinITCbetweenGSTR-2B andGSTR-3B include: Inputtaxcredit not claimed in previoustaxperiod(s) due to non-receipt of purchasedgoodsorservicesin thattaxperiod. | Explainer: When and why companies may receive incometaxorGST.... GSTinputtaxcredit (ITC) discrepancies.GSTnoticescan be issued when inputtaxcredit claimed inGSTR-3B does not match invoice data available inGSTR-2AorGSTR-2B. Such discrepancies may arise due to delayed filings by vendors, incorrect invoice details, or non-compliant suppliers. | GSTR-1 vsGSTR-3B vsGSTR-2B: WhyITCIs Blocked in 2026. ITCis getting blocked even when invoices exist andtaxis paid. In 2026,mismatchesbetweenGSTR-1,GSTR-3B, andGSTR-2B trigger system-drivenITCblocks. This guide explains why it happens and how businesses can avoid it. | DRC 01C InGSTIntimation:ITCMismatchGSTR-2B Vs... | Pice Blog. Hence,mismatchesoccurred inGSTR-2B. Sometimes misclassifying inter-stateGSTtransactions as intra-state, or vice versa, can even lead to incorrectGSTR-2B generation. At times whenITChad not been claimed during the previoustaxperiod(s), it can also cause confusion."
+    },
+    "research_timestamp": "2026-03-12T17:06:52.472264"
 }
