@@ -164,11 +164,18 @@ def classify_document(filename, file_bytes):
     ext = os.path.splitext(filename)[1].lower()
     contents = []
     
-    prompt = f"""You are a document classifier for Indian corporate credit underwriting.
-    Given the filename ({filename}) and a text preview, classify the document into exactly one of these types: 
-    ALM, ShareholdingPattern, BorrowingProfile, AnnualReport, PortfolioPerformance, BankStatement, GSTReturn, Unknown.
-    Return valid JSON only matching: {{"filename": "str", "detected_type": "str", "confidence": 0.0-1.0, "reasoning": "str"}}
-    """
+    prompt = f"""
+You are a financial document classifier. Classify the following document content.
+
+Document filename: {filename}
+
+Respond with ONLY a valid JSON object. No explanation, no markdown, no code fences.
+Exactly this format:
+{{"detected_type": "ALM", "confidence": 0.95, "reasoning": "Contains maturity buckets and liquidity gap"}}
+
+detected_type must be one of: ALM, ShareholdingPattern, BorrowingProfile, AnnualReport, PortfolioPerformance, BankStatement, GSTReturn, Unknown
+confidence must be a float between 0 and 1
+"""
 
     try:
         if ext in ['.xlsx', '.csv']:
@@ -491,10 +498,7 @@ def render_step_5():
             json.dump(payload, f, indent=4, default=str)
             
         st.success("Extraction complete! Payload saved to ./data/extraction_payload.json")
-        st.json(payload)
-        
-        if st.button("Proceed to Step 2 →", use_container_width=True):
-            st.switch_page("pages/02_research.py")
+        st.switch_page("pages/02_research.py")
 
 
 def main():

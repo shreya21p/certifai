@@ -1,95 +1,20 @@
 {
-  "decision": "MANUAL_REVIEW",
-  "recommended_loan_cr": 15,
-  "recommended_rate_pct": 14.5,
-  "pd": 0.38,
-  "lgd": 0.68,
-  "z_score": 1.95,
-  "confidence": 0.61,
-  "decision_rationale": [
-    "GST 2A/3B variance of 11.8% requires reconciliation before approval.",
-    "Promoter pledge at 48% is elevated; collateral quality (Stocks) carries 50% haircut.",
-    "Moderate CIBIL score 5/10 and 2 active e-Court cases require senior review."
-  ],
-  "swot": {
-    "strengths": [
-      "Established trading relationships",
-      "Revenue scale of \u20b9180Cr"
-    ],
-    "weaknesses": [
-      "High GST variance",
-      "Weak operating cashflow at 8.3%"
-    ],
-    "opportunities": [
-      "Working capital optimisation",
-      "GST compliance improvement"
-    ],
-    "threats": [
-      "Regulatory action on GST discrepancy",
-      "Debt-heavy balance sheet"
-    ]
-  },
-  "five_cs": {
-    "character": {
-      "score": 5,
-      "comment": "GST variance and e-Court cases require resolution"
-    },
-    "capacity": {
-      "score": 5,
-      "comment": "DSCR borderline at 0.89x; cashflow weak"
-    },
-    "capital": {
-      "score": 5,
-      "comment": "D/E ratio 2.5x is elevated for trading"
-    },
-    "collateral": {
-      "score": 4,
-      "comment": "Stocks with 50% haircut; limited coverage"
-    },
-    "conditions": {
-      "score": 5,
-      "comment": "Trading sector headwinds in FY25"
-    }
-  },
-  "conditions": [
-    "GST reconciliation statement (2A vs 3B) mandatory pre-disbursement.",
-    "Promoter pledge cap at 50%; personal guarantee required.",
-    "Monthly bank statement submission for first 12 months."
-  ],
-  "rejection_reason": null,
-  "india_specific_concerns": [
-    "GSTR-2A vs 3B variance of 11.8% is close to threshold for serious scrutiny.",
-    "CIBIL Commercial Score 5/10 indicates payment delays on existing obligations.",
-    "2 active e-Court cases require legal clearance before disbursement."
-  ],
-  "fraud_score": 30,
-  "fraud_flags": [
-    {
-      "flag": "GSTR_2A_3B_MODERATE_MISMATCH",
-      "severity": "HIGH",
-      "detail": "GSTR-2A vs 3B variance at 11.8%.",
-      "five_c": "Character"
-    },
-    {
-      "flag": "EARNINGS_QUALITY_RISK",
-      "severity": "HIGH",
-      "detail": "Operating cashflow 8.3% of revenue.",
-      "five_c": "Capacity"
-    }
-  ],
-  "triangulation_flags": [
-    {
-      "flag": "DECLARED_VS_DOCUMENT_REVENUE_GAP",
-      "severity": "HIGH",
-      "detail": "Onboarding \u20b9180Cr vs GST \u20b9205Cr \u2014 14% gap."
-    }
-  ],
-  "early_warning_signals": [
-    {
-      "signal": "HIGH_GST_VARIANCE",
-      "severity": "HIGH",
-      "source": "GST"
-    }
-  ],
-  "recommendation_timestamp": "2026-03-12T13:49:44.398762"
+    "decision": "APPROVE",
+    "recommended_loan_cr": 17.15,
+    "recommended_rate_pct": 13.29,
+    "pd": 0.284,
+    "lgd": 0.05,
+    "z_score": 1.896,
+    "confidence": 0.75,
+    "decision_rationale": [],
+    "swot": {},
+    "five_cs": {},
+    "conditions": [],
+    "rejection_reason": null,
+    "india_specific_concerns": [],
+    "fraud_score": 0,
+    "fraud_flags": [],
+    "triangulation_flags": [],
+    "early_warning_signals": [],
+    "recommendation_timestamp": "2026-03-12T16:20:58.690590"
 }

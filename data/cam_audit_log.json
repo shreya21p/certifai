@@ -81,5 +81,88 @@
       "final_recommendation": 0.85
     },
     "file_path": "./data/CAM_XYZ_Traders_Pvt_Ltd_20260312.pdf"
+  },
+  {
+    "version": "v2",
+    "timestamp": "2026-03-12T14:51:43.456874",
+    "company": "XYZ Traders Pvt Ltd",
+    "decision": "MANUAL_REVIEW",
+    "analyst_overrides": {
+      "committee_summary": {
+        "original_ai_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "analyst_edited_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "changed": false
+      },
+      "executive_summary": {
+        "original_ai_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "analyst_edited_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "changed": false
+      },
+      "company_overview": {
+        "original_ai_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "analyst_edited_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "changed": false
+      },
+      "promoter_background": {
+        "original_ai_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "analyst_edited_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "changed": false
+      },
+      "financial_analysis": {
+        "original_ai_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "analyst_edited_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "changed": false
+      },
+      "industry_outlook": {
+        "original_ai_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "analyst_edited_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "changed": false
+      },
+      "legal_risks": {
+        "original_ai_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "analyst_edited_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "changed": false
+      },
+      "five_cs_assessment": {
+        "original_ai_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "analyst_edited_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "changed": false
+      },
+      "swot_analysis": {
+        "original_ai_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "analyst_edited_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "changed": false
+      },
+      "key_risk_drivers": {
+        "original_ai_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "analyst_edited_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "changed": false
+      },
+      "early_warning_indicators": {
+        "original_ai_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "analyst_edited_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "changed": false
+      },
+      "final_recommendation": {
+        "original_ai_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "analyst_edited_text": "[AI generation failed \u2014 please edit manually. Error: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}]",
+        "changed": false
+      }
+    },
+    "confidence_scores": {
+      "committee_summary": 0.85,
+      "executive_summary": 0.85,
+      "company_overview": 0.85,
+      "promoter_background": 0.85,
+      "financial_analysis": 0.85,
+      "industry_outlook": 0.85,
+      "legal_risks": 0.85,
+      "five_cs_assessment": 0.85,
+      "swot_analysis": 0.85,
+      "key_risk_drivers": 0.85,
+      "early_warning_indicators": 0.85,
+      "final_recommendation": 0.85
+    },
+    "file_path": "./data/CAM_XYZ_Traders_Pvt_Ltd_20260312.pdf"
   }
 ]
