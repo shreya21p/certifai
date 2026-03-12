@@ -1,4 +1,4 @@
-#  CertifAI (Intelli-Credit)
+#  CertifAI 
 ### *A Backend-Driven Credit Governance & Execution Engine*
 
 > *Transforming raw financial documents into structured, accountable corporate credit operations.*
