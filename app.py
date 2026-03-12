@@ -580,20 +580,18 @@ with st.sidebar:
     """, unsafe_allow_html=True)
     st.divider()
 
-    # ── Step progress ────────────────────────────────────────────────────────
+    # ── Step progress (Clickable Navigation) ─────────────────────────────────
     s1 = _step_status("extraction_payload")
     s2 = _step_status("research_payload")
     s3 = _step_status("recommendation_payload")
     s4 = "✅" if os.path.exists("./data/cam_audit_log.json") else "⬜"
 
-    st.markdown(f"""
-    **Pipeline Progress**
-
-    {s1} **Step 1** — Entity & Documents  
-    {s2} **Step 2** — Research & Insights  
-    {s3} **Step 3** — Risk Analysis  
-    {s4} **Step 4** — CAM Report
-    """)
+    st.markdown("**Pipeline Navigation**")
+    st.page_link("pages/01_ingestor.py",       label=f"{s1} Step 1 — Entity & Docs")
+    st.page_link("pages/02_research.py",       label=f"{s2} Step 2 — Research")
+    st.page_link("pages/03_recommendation.py", label=f"{s3} Step 3 — Risk Engine")
+    st.page_link("pages/04_cam.py",            label=f"{s4} Step 4 — CAM Report")
+    
     st.divider()
 
     # ── Key metrics if available ──────────────────────────────────────────────

@@ -1,0 +1,37 @@
+{
+  "research_output": {
+    "composite_external_risk_score": 6.1,
+    "legal_risk_score": 4.5,
+    "operational_risk_score": 5.5,
+    "mca_risk_score": 3.0,
+    "gst_compliance_score": 6.5,
+    "sector_risk_score": 5.5,
+    "sector_summary": "Indian trading sector faces margin pressure in FY25 due to import cost volatility and GST enforcement tightening.",
+    "early_warning_signals": [
+      {
+        "signal": "HIGH_GST_VARIANCE",
+        "severity": "HIGH",
+        "source": "GST",
+        "five_c_mapping": "Character"
+      }
+    ],
+    "news_summary": "Minor trade disputes reported in 2024. No major fraud cases."
+  },
+  "primary_insights": {
+    "factory_capacity_pct": 65,
+    "management_quality": "Average",
+    "cibil_commercial_verified": "Yes \u2014 Minor Issues",
+    "ecourt_cases_found": 2,
+    "rbi_compliance": "Pending Items",
+    "mca_last_filing_date": "2024-04-10"
+  },
+  "triangulation_flags": [
+    {
+      "flag": "DECLARED_VS_DOCUMENT_REVENUE_GAP",
+      "severity": "HIGH",
+      "detail": "Onboarding turnover \u20b9180Cr vs GST-declared \u20b9205Cr \u2014 14% gap.",
+      "recommended_action": "Obtain GST reconciliation and board resolution."
+    }
+  ],
+  "research_timestamp": "2026-03-12T13:49:44.398738"
+}

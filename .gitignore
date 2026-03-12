@@ -1,8 +1,8 @@
 .env
 __pycache__
-__pycache__/
 *.pyc
 venv/
 env/
 .vscode/
 .DS_Store
+utils/__pycache__

@@ -43,9 +43,10 @@ def load_payload(name: str, filepath: str, required_step: int):
                 st.session_state[name] = json.load(f)
             st.info(f"Session restored from {filepath}")
         except FileNotFoundError:
+            _page_map = {1: "pages/01_ingestor.py", 2: "pages/02_research.py", 3: "pages/03_recommendation.py"}
             st.warning(f"⚠ {name} not found. Please complete Step {required_step} first.")
             if st.button(f"← Go to Step {required_step}"):
-                st.switch_page(f"pages/0{required_step}_{'ingestor' if required_step==1 else 'research' if required_step==2 else 'recommendation'}.py")
+                st.switch_page(_page_map[required_step])
             st.stop()
 
 load_payload("extraction_payload",     "./data/extraction_payload.json",     1)

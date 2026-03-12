@@ -108,10 +108,6 @@ steps_done = sum([
     "research_payload"   in st.session_state,
     "recommendation_payload" in st.session_state,
 ])
-st.title("🏦 Module 3 — Recommendation Engine")
-st.progress(steps_done / 4, text=f"Pipeline: {steps_done}/4 modules complete")
-st.caption(f"Evaluating **{company_name}** | Sector: {sector} | Loan: ₹{loan_amount:.1f} Cr")
-st.divider()
 
 extraction_payload: dict = st.session_state["extraction_payload"]
 research_payload:   dict = st.session_state["research_payload"]
@@ -128,6 +124,12 @@ ewi_list         = research_output.get("early_warning_signals", []) or []
 company_name = entity.get("company_name", "Entity")
 sector       = entity.get("sector", "Other")
 loan_amount  = float(entity.get("loan_amount") or entity.get("loan_amount_cr") or 0)
+
+st.title("🏦 Module 3 — Recommendation Engine")
+st.progress(steps_done / 4, text=f"Pipeline: {steps_done}/4 modules complete")
+st.caption(f"Evaluating **{company_name}** | Sector: {sector} | Loan: ₹{loan_amount:.1f} Cr")
+st.divider()
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE HEADER
@@ -651,154 +653,100 @@ with tab2:
         st.info("Five Cs radar unavailable — AI assessment required.")
 
     # ─────────────────────────────────────────────────────────────────────────
-    # PANEL 4 — ENTITY RELATIONSHIP GRAPH (streamlit-agraph)
+    # PANEL 4 — ENTITY RELATIONSHIP GRAPH (Native Plotly)
     # ─────────────────────────────────────────────────────────────────────────
     st.markdown("### 🕸️ Entity Relationship Graph")
     try:
-        from streamlit_agraph import agraph, Node, Edge, Config  # type: ignore
-
-        nodes: list = []
-        edges: list = []
-        adjacency: dict = {}
-
-        # ── Central company node ─────────────────────────────────────────
-        nodes.append(Node(
-            id="company",
-            label=company_name,
-            size=30,
-            color="#1B3A6B",
-            font={"color": "#ffffff"},
-        ))
-
-        # ── Promoter nodes (from shareholding data if available) ──────────
+        import plotly.graph_objects as go
+        
+        # We will position nodes manually for a clean "Star" layout around the Company
+        nodes_data = {}
+        edges_data = []
+        
+        # 1. Company (Center)
+        nodes_data["company"] = {"label": company_name, "x": 0, "y": 0, "color": "#1B3A6B", "size": 35}
+        
+        # 2. Promoters
         promoter_holding = financials.get("promoter_holding_pct")
         if promoter_holding is not None:
-            nodes.append(Node(
-                id="promoter",
-                label=f"Promoters\n({promoter_holding}%)",
-                size=20,
-                color="#3b82f6",
-            ))
-            edges.append(Edge(source="promoter", target="company", label="Holds"))
-            adjacency.setdefault("promoter", []).append("company")
+            nodes_data["promoter"] = {"label": f"Promoters<br>({promoter_holding}%)", "x": 0, "y": 1, "color": "#3b82f6", "size": 25}
+            edges_data.append(("company", "promoter", "Holds"))
+            
+            # Pledged
+            pledge_pct = financials.get("promoter_pledge_pct")
+            if pledge_pct and float(pledge_pct or 0) > 0:
+                nodes_data["pledge"] = {"label": f"Pledged<br>({pledge_pct}%)", "x": 0, "y": 2, "color": "#f59e0b", "size": 20}
+                edges_data.append(("promoter", "pledge", "Pledged"))
 
-        # ── Pledged promoter node ─────────────────────────────────────────
-        pledge_pct = financials.get("promoter_pledge_pct")
-        if pledge_pct and float(pledge_pct or 0) > 0:
-            nodes.append(Node(
-                id="pledge",
-                label=f"Pledged\n({pledge_pct}%)",
-                size=15,
-                color="#f59e0b",
-            ))
-            edges.append(Edge(source="promoter", target="pledge", label="Pledged to bank"))
-            adjacency.setdefault("promoter", []).append("pledge")
-
-        # ── Collateral node ───────────────────────────────────────────────
-        col_type  = entity.get("collateral_type", "None")
-        col_value = float(entity.get("collateral_value") or
-                          entity.get("collateral_value_cr") or 0)
+        # 3. Collateral
+        col_type = entity.get("collateral_type", "None")
+        col_value = float(entity.get("collateral_value") or entity.get("collateral_value_cr") or 0)
         if col_type and col_type != "None":
-            nodes.append(Node(
-                id="collateral",
-                label=f"Collateral\n{col_type}\n₹{col_value:.0f}Cr",
-                size=18,
-                color="#059669",
-            ))
-            edges.append(Edge(source="company", target="collateral", label="Offered as"))
-            adjacency.setdefault("company", []).append("collateral")
+            nodes_data["collateral"] = {"label": f"Collateral<br>{col_type}<br>₹{col_value:.0f}Cr", "x": 1, "y": 0, "color": "#059669", "size": 25}
+            edges_data.append(("company", "collateral", "Offered as"))
 
-        # ── Bank node ─────────────────────────────────────────────────────
-        nodes.append(Node(
-            id="bank",
-            label="Lending Bank",
-            size=22,
-            color="#6d28d9",
-        ))
-        edges.append(Edge(source="bank", target="company", label="Loan Applied"))
-        adjacency.setdefault("bank", []).append("company")
+        # 4. Bank
+        nodes_data["bank"] = {"label": "Lending Bank", "x": -1, "y": 0, "color": "#6d28d9", "size": 30}
+        edges_data.append(("bank", "company", "Loan Applied"))
 
-        # ── Existing debt node ────────────────────────────────────────────
+        # 5. Debt
         total_debt = float(financials.get("total_debt_cr") or 0)
         if total_debt > 0:
-            nodes.append(Node(
-                id="debt",
-                label=f"Existing Debt\n₹{total_debt:.0f}Cr",
-                size=16,
-                color="#64748b",
-            ))
-            edges.append(Edge(source="company", target="debt", label="Owes"))
-            adjacency.setdefault("company", []).append("debt")
+            nodes_data["debt"] = {"label": f"Existing Debt<br>₹{total_debt:.0f}Cr", "x": 0, "y": -1, "color": "#64748b", "size": 25}
+            edges_data.append(("company", "debt", "Owes"))
 
-        # ── Highlight nodes related to fraud flags in red ─────────────────
-        fraud_entity_labels = set()
-        for fl in all_flags:
-            ent = (fl or {}).get("entity")
-            if ent:
-                fraud_entity_labels.add(str(ent).lower())
+        # Build Plotly Figure
+        edge_x = []
+        edge_y = []
+        for src, dst, label in edges_data:
+            x0, y0 = nodes_data[src]["x"], nodes_data[src]["y"]
+            x1, y1 = nodes_data[dst]["x"], nodes_data[dst]["y"]
+            edge_x.extend([x0, x1, None])
+            edge_y.extend([y0, y1, None])
 
-        for node in nodes:
-            if (node.label or "").lower() in fraud_entity_labels:
-                node.color = "#EF4444"
+        edge_trace = go.Scatter(
+            x=edge_x, y=edge_y,
+            line=dict(width=3, color='#9ca3af'),
+            hoverinfo='none',
+            mode='lines'
+        )
 
-        # ── DFS Cycle Detection ───────────────────────────────────────────
-        def has_cycle(adj: dict) -> tuple:
-            visited   = set()
-            rec_stack = set()
-            cycle_path: list = []
+        node_x = [nd["x"] for nd in nodes_data.values()]
+        node_y = [nd["y"] for nd in nodes_data.values()]
+        node_text = [nd["label"] for nd in nodes_data.values()]
+        node_color = [nd["color"] for nd in nodes_data.values()]
+        node_size = [nd["size"] for nd in nodes_data.values()]
 
-            def dfs(node, path):
-                visited.add(node)
-                rec_stack.add(node)
-                path.append(node)
-                for neighbor in adj.get(node, []):
-                    if neighbor not in visited:
-                        if dfs(neighbor, path):
-                            return True
-                    elif neighbor in rec_stack:
-                        cycle_path.extend(path)
-                        return True
-                rec_stack.discard(node)
-                path.pop()
-                return False
-
-            for n in list(adj.keys()):
-                if n not in visited:
-                    if dfs(n, []):
-                        return True, cycle_path
-            return False, []
-
-        cycle_found, cycle_nodes_list = has_cycle(adjacency)
-        cycle_nodes_set = set(cycle_nodes_list)
-
-        if cycle_found:
-            for edge in edges:
-                if edge.source in cycle_nodes_set and edge.target in cycle_nodes_set:
-                    edge.color = "#EF4444"
-            st.error(
-                "🔴 **CIRCULAR TRADING DETECTED** — Cyclic entity relationships found. "
-                "Flag for investigation."
+        node_trace = go.Scatter(
+            x=node_x, y=node_y,
+            mode='markers+text',
+            text=node_text,
+            textposition="top center" if not any(y>0 for y in node_y) else "bottom center",
+            hoverinfo='text',
+            marker=dict(
+                showscale=False,
+                color=node_color,
+                size=node_size,
+                line_width=2,
+                line_color='white'
             )
-
-        config = Config(
-            width=700,
-            height=480,
-            directed=True,
-            physics=True,
-            hierarchical=False,
-            nodeHighlightBehavior=True,
-            highlightColor="#f97316",
-            collapsible=False,
-            node={"labelProperty": "label"},
-            link={"labelProperty": "label", "renderLabel": True},
         )
-        agraph(nodes=nodes, edges=edges, config=config)
 
-    except ImportError:
-        st.warning(
-            "⚠️ `streamlit-agraph` is not installed. "
-            "Run `pip install streamlit-agraph` and restart."
+        fig_net = go.Figure(data=[edge_trace, node_trace])
+        fig_net.update_layout(
+            title='',
+            showlegend=False,
+            height=400,
+            hovermode='closest',
+            margin=dict(b=20,l=20,r=20,t=20),
+            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            plot_bgcolor="white",
+            paper_bgcolor="white"
         )
+            
+        st.plotly_chart(fig_net, use_container_width=True)
+
     except Exception as ex:
         st.error(f"Entity graph error: {ex}")
 

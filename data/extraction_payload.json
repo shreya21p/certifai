@@ -1,0 +1,60 @@
+{
+  "entity_context": {
+    "company_name": "XYZ Traders Pvt Ltd",
+    "cin": "U51909DL2015PTC289012",
+    "pan": "AABCX5678G",
+    "sector": "Other",
+    "sub_sector": "Trading",
+    "annual_turnover_cr": 180,
+    "loan_amount": 25,
+    "loan_amount_cr": 25,
+    "loan_type": "Working Capital",
+    "collateral_type": "Stocks",
+    "collateral_value": 18,
+    "collateral_value_cr": 18,
+    "cibil_commercial_score": 5,
+    "gstr_2a_3b_mismatch_flag": "Moderate (5\u201315%)",
+    "mca_last_filing_date": "2024-04-10",
+    "years_op": 9,
+    "existing_relationship": "No",
+    "tenure": 36,
+    "purpose": "Working capital for bulk trading operations"
+  },
+  "financials": {
+    "revenue_cr": 180,
+    "ebitda_cr": 22,
+    "pat_cr": 9,
+    "total_debt_cr": 140,
+    "net_worth_cr": 55,
+    "operating_cashflow_cr": 15,
+    "total_assets_cr": 210,
+    "promoter_holding_pct": 72.0,
+    "promoter_pledge_pct": 48,
+    "gst_declared_sales_cr": 205,
+    "gst_2a_vs_3b_variance_pct": 11.8,
+    "avg_monthly_bank_inflow_cr": 12.0,
+    "cibil_commercial_score": 5
+  },
+  "fraud_flags": [
+    {
+      "flag": "GSTR_2A_3B_MODERATE_MISMATCH",
+      "severity": "HIGH",
+      "detail": "GSTR-2A vs 3B variance at 11.8%. Seek reconciliation statement.",
+      "five_c": "Character"
+    },
+    {
+      "flag": "EARNINGS_QUALITY_RISK",
+      "severity": "HIGH",
+      "detail": "Operating cashflow 8.3% of revenue. Possible working capital stress.",
+      "five_c": "Capacity"
+    }
+  ],
+  "document_sources": [
+    "BankStatement_FY24.pdf",
+    "GSTReturn_Q4.xlsx"
+  ],
+  "extraction_timestamp": "2026-03-12T13:49:44.398727",
+  "schema_config": [],
+  "data_lineage": {},
+  "gst_variance_pct": 11.8
+}
