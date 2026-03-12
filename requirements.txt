@@ -1,5 +1,6 @@
 # Core framework
 streamlit==1.54.0
+ddgs
 
 # AI / LLM
 google-genai==1.66.0
