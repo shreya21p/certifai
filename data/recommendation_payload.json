@@ -1,80 +1,81 @@
 {
     "decision": "APPROVE",
     "recommended_loan_cr": 9.06,
-    "recommended_rate_pct": 13.31,
-    "pd": 0.2866,
+    "recommended_rate_pct": 13.12,
+    "pd": 0.2628,
     "lgd": 0.05,
     "z_score": 2.385,
     "confidence": 0.7,
     "decision_rationale": [
-        "Despite moderate distress risks (Altman Z-Score: 2.385) and a relatively high Probability of Default (28.7%), the proposal is approved for a reduced amount, balancing risk with potential returns.",
-        "The low Loss Given Default (5.0%) is a key mitigating factor, indicating strong recovery prospects in case of default.",
-        "The company demonstrates a good operational compliance record with an RBI/GST Compliance Score of 8.0.",
-        "The approved loan amount is capped at \u20b99.06Cr, which is significantly lower than the requested \u20b912.0Cr, aligning with a more conservative assessment of the company's financial capacity and risk profile.",
-        "The 70.0% confidence level in the approval indicates a considered decision, with explicit conditions to address identified risks."
+        "Despite significant red flags including a moderate Altman Z-Score (2.385) and a high Probability of Default (26.3%), the very low Loss Given Default (5.0%) significantly mitigates the potential financial impact in case of default.",
+        "The internal decision to APPROVE, albeit with 70.0% confidence, implies that with robust conditions and active monitoring, the identified risks are manageable and the overall credit exposure is acceptable.",
+        "The RBI/GST Compliance Score of 8.0 is a positive indicator of the company's general regulatory adherence in key areas.",
+        "The loan approval is contingent on stringent conditions, particularly reducing the sanctioned amount to align with the maximum recommended loan (\u20b99.06Cr) and addressing all identified compliance and legal discrepancies."
     ],
     "swot": {
         "strengths": [
-            "Low Loss Given Default (5.0%) suggests robust recovery potential for the bank's exposure.",
-            "Good RBI/GST Compliance Score (8.0) indicates a strong track record in regulatory adherence.",
-            "The recommended interest rate of 13.31% offers an attractive yield for the bank on the approved exposure."
+            "Very low Loss Given Default (5.0%), indicating strong collateral or recovery prospects.",
+            "Good RBI/GST Compliance Score (8.0) points to general regulatory adherence.",
+            "The approval decision with 70% confidence suggests underlying business viability with appropriate risk mitigation."
         ],
         "weaknesses": [
-            "High Probability of Default (28.7%) and moderate Altman Z-Score (2.385) point to significant financial vulnerability.",
-            "The loan requested (\u20b912.0Cr) substantially exceeds the maximum recommended loan (\u20b99.06Cr), indicating potential over-optimism or over-leverage.",
-            "Significant GSTR-2A vs 3B variance (8.1%) raises concerns about financial transparency and reporting accuracy.",
-            "One active e-Courts case and a high-severity legal signal mismatch flag highlight potential legal and administrative risks.",
-            "A promoter pledge on RKA Holdings (high severity EWS) presents a material risk to promoter capital and commitment."
+            "Moderate distress risk indicated by Altman Z-Score (2.385) and high Probability of Default (26.3%).",
+            "Significant variance in GSTR-2A vs 3B (8.1%) and delayed MCA filing status raise compliance concerns.",
+            "Presence of one active e-Courts case and a critical legal data triangulation mismatch.",
+            "Loan requested (\u20b912.0Cr) significantly exceeds the Max Recommended Loan (\u20b99.06Cr).",
+            "Promoter pledge on shares indicates potential liquidity strain at the promoter level.",
+            "Low External Risk Score (4.14/10) signals elevated overall external risks."
         ],
         "opportunities": [
-            "Potential for Raj Textiles to consolidate its market position by navigating sectoral challenges with bank support.",
-            "Optimization of working capital management can improve cash flow, addressing Altman Z-Score concerns.",
-            "Strengthening internal controls and compliance can enhance investor confidence and reduce administrative oversights."
+            "To improve financial transparency and compliance by addressing GSTR variance, MCA filing, and legal clearances.",
+            "Strengthen the balance sheet and corporate governance through adherence to loan conditions.",
+            "Potential for business growth if underlying operational and financial issues are effectively managed."
         ],
         "threats": [
-            "Global economic headwinds, US reciprocal tariffs, and declining textile exports in India (-2.35% degrowth) pose significant external pressures.",
-            "Exposure to legal risks from the active e-Courts case and unclarified legal keywords from web sources.",
-            "The promoter pledge on RKA Holdings introduces counterparty risk and could impact the company's financial stability.",
-            "Potential for administrative penalties or reputational damage due to delayed MCA filing."
+            "High default risk, potentially leading to financial losses despite low LGD.",
+            "Escalation of legal disputes or non-compliance could severely impact business operations and reputation.",
+            "Inability to meet stringent loan conditions could lead to default or further deterioration of credit profile.",
+            "Regulatory scrutiny or penalties due to ongoing compliance lapses."
         ]
     },
     "five_cs": {
         "character": {
-            "score": 4,
-            "comment": "Character is assessed with significant concerns due to a high GSTR-2A vs 3B variance (8.1%), a high-severity triangulation flag indicating legal signal mismatch (web vs. documents), and one active e-Courts case. The MCA filing being 362 days old also signals potential administrative oversight. However, a good RBI/GST Compliance Score (8.0) partially mitigates these concerns."
+            "score": 3,
+            "comment": "Significant concerns exist regarding the company's compliance and transparency, evidenced by the high GSTR-2A vs 3B variance (8.1%), delayed MCA filing status, and a critical legal data triangulation mismatch between web and document sources. A court clearance certificate and GSTR reconciliation are imperative."
         },
         "capacity": {
-            "score": 3,
-            "comment": "Capacity is significantly concerning, evidenced by a high Probability of Default (28.7%) and a moderate Altman Z-Score (2.385), indicating moderate distress risk. The requested loan significantly exceeds the maximum recommended amount, and the active e-Courts case (1) also negatively impacts capacity as per India-specific guidelines."
+            "score": 4,
+            "comment": "The company's capacity to repay is under moderate stress, indicated by an Altman Z-Score of 2.385 (moderate distress risk) and a high Probability of Default (26.3%). Furthermore, the presence of one active e-Courts case introduces potential operational and financial strain."
         },
         "capital": {
-            "score": 4,
-            "comment": "Capital strength has significant concerns, primarily due to the high-severity Early Warning Signal regarding a promoter pledge on RKA Holdings. This represents a material promoter risk and potential strain on the overall capital structure and liquidity of the promoter's group."
+            "score": 5,
+            "comment": "There is an acknowledged promoter pledge on RKA Holdings shares. While a plan for its release by September 2025 post term loan part-prepayment is in place, this signals potential liquidity management considerations at the promoter level that require close monitoring."
         },
         "collateral": {
-            "score": 7,
-            "comment": "While specific collateral details are not provided, the very low Loss Given Default (5.0%) suggests robust recovery prospects, likely supported by adequate collateralization or effective recovery mechanisms. This indicates only minor concerns regarding asset security for the recommended loan amount."
+            "score": 8,
+            "comment": "The extremely low Loss Given Default (5.0%) is a significant strength, indicating robust collateral coverage or strong recovery prospects, which substantially mitigates the credit risk exposure for the bank."
         },
         "conditions": {
-            "score": 4,
-            "comment": "Conditions are challenging due to significant external headwinds affecting the textile sector. India's textile and apparel exports have experienced degrowth, coupled with global economic uncertainties and US reciprocal tariffs. This creates a difficult operating environment for the company."
+            "score": 7,
+            "comment": "The approval of this loan is heavily reliant on the successful implementation and strict adherence to specific conditions, including a reduction in the sanctioned loan amount, resolution of all compliance discrepancies, and diligent monitoring of the promoter share pledge. These conditions are pivotal in transforming a high-risk proposal into an acceptable one."
         }
     },
     "conditions": [
-        "Loan amount to be strictly limited to \u20b99.06Cr at an interest rate of 13.31%.",
-        "Borrower to provide a detailed reconciliation statement for the GSTR-2A vs 3B variance within 30 days.",
-        "Borrower to submit a court clearance certificate for any active legal cases identified through e-Courts and to clarify the legal signals from web sources.",
-        "Enhanced monitoring of the company's leverage and cash flows, requiring mandatory quarterly financial submissions and projections.",
-        "Borrower to provide an undertaking and a clear timeline for the release of the promoter pledge on RKA Holdings, along with regular status updates.",
-        "Confirmation of timely completion and submission of the pending MCA filing."
+        "Reduce the loan sanction amount to a maximum of \u20b99.06Cr, aligning with the Max Recommended Loan.",
+        "Obtain a detailed GSTR-2A vs 3B reconciliation statement from the borrower.",
+        "Obtain a court clearance certificate for the active e-Courts case and any other potential legal proceedings.",
+        "Ensure immediate and timely compliance with all MCA filing requirements.",
+        "Monitor the plan for releasing the promoter pledge on RKA Holdings shares by September 2025.",
+        "Implement quarterly review of compliance with RBI/GST regulations and financial performance.",
+        "Charge the recommended interest rate of 13.12%."
     ],
     "rejection_reason": null,
     "india_specific_concerns": [
-        "Significant GSTR-2A vs 3B variance (8.1%) raising questions about compliance and financial reporting accuracy.",
-        "Presence of one active e-Courts case, indicating potential legal and litigation exposure.",
-        "Triangulation flags highlight contradictions between publicly available web information (legal keywords) and submitted documents, requiring immediate clarification.",
-        "MCA filing status showing the last filing 362 days old, nearing the annual deadline and signaling potential administrative oversight.",
-        "The broader macroeconomic context of degrowth in India's textile and apparel exports presents a systemic risk to the sector."
+        "Significant GSTR-2A vs 3B Variance (8.1%) requiring reconciliation.",
+        "Presence of one active e-Courts case necessitates legal investigation and clearance.",
+        "Delayed or unavailable MCA Filing Status indicating potential compliance lapses.",
+        "Critical legal data triangulation mismatch between web intelligence and primary documents.",
+        "CIBIL Commercial Score not available, limiting a comprehensive view of credit behavior."
     ],
     "fraud_score": 33,
     "fraud_flags": [
@@ -102,54 +103,47 @@
     ],
     "early_warning_signals": [
         {
-            "signal": "India's textile and apparel exports degrowth",
-            "severity": "MEDIUM",
-            "source": "NEWS",
-            "detail": "India's textile and apparel exports registered a degrowth of -2.35% from April 2025 to January 2026, posing a headwind for export-oriented businesses.",
-            "five_c_mapping": "Conditions"
-        },
-        {
-            "signal": "Active e-Courts case",
-            "severity": "MEDIUM",
-            "source": "PRIMARY",
-            "detail": "One active litigation record found in e-Courts, indicating potential legal exposure for the company.",
+            "signal": "GSTR-2A vs 3B Variance (8.1%)",
+            "severity": "HIGH",
+            "source": "GST",
+            "detail": "A significant 8.1% variance between GSTR-2A and 3B signals potential issues with Input Tax Credit (ITC) reconciliation, possibly indicating supplier non-compliance or incorrect ITC claims. As per existing fraud flag 'GSTR_2A_3B_MODERATE_MISMATCH', seeking a reconciliation statement from the borrower is crucial. (Source: EXISTING FRAUD FLAGS FROM DOCUMENT ANALYSIS)",
             "five_c_mapping": "Character"
         },
         {
-            "signal": "Global headwinds, US tariffs, and declining textile exports",
+            "signal": "MCA Filing Delay",
             "severity": "MEDIUM",
-            "source": "SECTOR",
-            "detail": "The textile sector faces global headwinds, US reciprocal tariffs, and a recent decline in textile exports, creating challenging operating conditions.",
-            "five_c_mapping": "Conditions"
+            "source": "MCA",
+            "detail": "The company's last MCA filing (2025-03-15) is 362 days old, approaching the annual deadline. This, as per the existing fraud flag 'MCA_FILING_DELAYED', suggests a potential administrative oversight or compliance delay requiring prompt attention. (Source: EXISTING FRAUD FLAGS FROM DOCUMENT ANALYSIS)",
+            "five_c_mapping": "Character"
         },
         {
-            "signal": "Promoter pledge on RKA Holdings",
-            "severity": "HIGH",
-            "source": "PRIMARY",
-            "detail": "The MD acknowledged a promoter pledge on RKA Holdings, which, despite expectations of release by Sep-2025, represents a significant promoter risk.",
+            "signal": "Active e-Courts Litigation",
+            "severity": "MEDIUM",
+            "source": "LEGAL",
+            "detail": "Primary field notes confirm 1 active e-Courts case. The nature and financial implications of this litigation need to be thoroughly investigated. (Source: PRIMARY FIELD NOTES)",
+            "five_c_mapping": "Capacity"
+        },
+        {
+            "signal": "Legal Data Triangulation Mismatch",
+            "severity": "CRITICAL",
+            "source": "TRIANGULATION",
+            "detail": "Web intelligence with general legal keywords like NCLT did not yield specific adverse findings for Raj Textiles, yet primary field notes indicate one active e-Courts case. This contradiction, highlighted by the 'LEGAL_SIGNAL_DOCUMENT_MISMATCH' triangulation flag, is a critical early warning. A court clearance certificate from the borrower is required to fully understand the implications. (Source: TRIANGULATION FLAGS)",
+            "five_c_mapping": "Character"
+        },
+        {
+            "signal": "Promoter Pledge on Shares",
+            "severity": "MEDIUM",
+            "source": "PROMOTER",
+            "detail": "The MD acknowledged a promoter pledge on RKA Holdings. While a plan for release by Sep-2025 post term loan part-prepayment is in place, this situation requires close monitoring. (Source: PRIMARY FIELD NOTES)",
             "five_c_mapping": "Capital"
         },
         {
-            "signal": "MCA filing is 362 days old",
+            "signal": "CIBIL Commercial Score with Minor Issues",
             "severity": "MEDIUM",
-            "source": "MCA",
-            "detail": "The last MCA filing was on 2025-03-15, making it 362 days old and nearing the annual deadline, signaling potential administrative oversight.",
-            "five_c_mapping": "Character"
-        },
-        {
-            "signal": "GSTR-2A vs 3B variance at 8.1%",
-            "severity": "HIGH",
-            "source": "GST",
-            "detail": "A significant 8.1% variance between GSTR-2A and GSTR-3B, indicating potential compliance issues related to ITC claims or sales reporting.",
-            "five_c_mapping": "Character"
-        },
-        {
-            "signal": "CIBIL Commercial Minor Issues",
-            "severity": "MEDIUM",
-            "source": "PRIMARY",
-            "detail": "CIBIL Commercial score of 7.0 with 'Minor Issues' noted, indicating some past credit irregularities.",
+            "source": "FINANCIAL",
+            "detail": "A CIBIL Commercial Score of 7.0 with 'Minor Issues' indicates some past credit delinquencies or inconsistencies. Further investigation into the nature of these minor issues is necessary to assess the full risk to the company's creditworthiness. (Source: PRIMARY FIELD NOTES, INDIA-SPECIFIC DATA FROM DOCUMENTS)",
             "five_c_mapping": "Character"
         }
     ],
-    "recommendation_timestamp": "2026-03-12T23:31:28.696980"
+    "recommendation_timestamp": "2026-03-12T23:48:32.715722"
 }
