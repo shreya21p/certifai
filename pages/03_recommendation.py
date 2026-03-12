@@ -12,6 +12,7 @@ import streamlit as st
 
 from utils.credit_engine import CreditEngine
 from utils.gemini_client import call_gemini_with_retry
+from utils.ui_icons import svg_header, get_svg, icon_label
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Page config
@@ -94,7 +95,7 @@ def load_payload(name: str, filepath: str, required_step: int):
                 st.session_state[name] = json.load(f)
             st.info(f"Session restored from {filepath}")
         except FileNotFoundError:
-            st.warning(f"⚠ {name} not found. Please complete Step {required_step} first.")
+            st.warning(f"{name} not found. Please complete Step {required_step} first.", icon=":material/warning:")
             if st.button(f"← Go to Step {required_step}"):
                 st.switch_page(f"pages/0{required_step}_{'ingestor' if required_step==1 else 'research' if required_step==2 else 'recommendation'}.py")
             st.stop()
@@ -125,7 +126,7 @@ company_name = entity.get("company_name", "Entity")
 sector       = entity.get("sector", "Other")
 loan_amount  = float(entity.get("loan_amount") or entity.get("loan_amount_cr") or 0)
 
-st.title("🏦 Module 3 — Recommendation Engine")
+svg_header("BANK", "Module 3 — Recommendation Engine", level=1)
 st.progress(steps_done / 4, text=f"Pipeline: {steps_done}/4 modules complete")
 st.caption(f"Evaluating **{company_name}** | Sector: {sector} | Loan: ₹{loan_amount:.1f} Cr")
 st.divider()
@@ -137,7 +138,7 @@ st.divider()
 # DELETED OLD HEADER
 st.divider()
 
-tab1, tab2 = st.tabs(["📊 Credit Risk Engine", "🔬 Forensic Dashboard"])
+tab1, tab2 = st.tabs(["Credit Risk Engine", "Forensic Dashboard"])
 
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -148,7 +149,7 @@ with tab1:
     # ── Run engine ──────────────────────────────────────────────────────────
     engine = CreditEngine()
 
-    with st.spinner("⚙️ Running quantitative credit evaluation..."):
+    with st.spinner("Running quantitative credit evaluation..."):
         result = engine.run_credit_evaluation(extraction_payload, research_payload)
 
     z_score    = result["z_score"]
@@ -251,7 +252,7 @@ Return JSON with exactly these fields:
 }}
 """
         try:
-            with st.spinner("🤖 Generating AI credit assessment..."):
+            with st.spinner("Generating AI credit assessment..."):
                 raw = call_gemini_with_retry([prompt], response_mime_type="application/json")
                 gemini_response = json.loads(raw)
                 st.session_state[gemini_cache_key] = gemini_response
@@ -339,7 +340,7 @@ Return JSON with exactly these fields:
         css_cls = "decision-reject"
 
     st.markdown(
-        f'<div class="{css_cls}">{icon} &nbsp; {decision.replace("_", " ")}</div>',
+        f'<div class="{css_cls}">{decision.replace("_", " ")}</div>',
         unsafe_allow_html=True,
     )
     st.markdown("")
@@ -359,7 +360,7 @@ Return JSON with exactly these fields:
     # ─────────────────────────────────────────────────────────────────────────
     # ROW 3 — LOAN STRUCTURING TABLE
     # ─────────────────────────────────────────────────────────────────────────
-    st.markdown("### 📐 Loan Structuring")
+    svg_header("EDIT", "Loan Structuring", level=3)
     col_l, col_r = st.columns([3, 2])
     with col_l:
         import pandas as pd
@@ -391,7 +392,7 @@ Return JSON with exactly these fields:
     # ─────────────────────────────────────────────────────────────────────────
     # ROW 4 — FIVE Cs HEATMAP
     # ─────────────────────────────────────────────────────────────────────────
-    st.markdown("### 🔷 Five Cs Assessment")
+    svg_header("DASHBOARD", "Five Cs Assessment", level=3)
     if five_cs:
         cs_names  = ["character", "capacity", "capital", "collateral", "conditions"]
         cs_labels = ["Character", "Capacity", "Capital", "Collateral", "Conditions"]
@@ -423,7 +424,7 @@ Return JSON with exactly these fields:
     # ─────────────────────────────────────────────────────────────────────────
     # ROW 5 — SWOT 2×2 GRID
     # ─────────────────────────────────────────────────────────────────────────
-    st.markdown("### 🧩 SWOT Analysis")
+    svg_header("ENTITY", "SWOT Analysis", level=3)
     if swot:
         sw_col, op_col = st.columns(2)
         with sw_col:
@@ -469,7 +470,7 @@ Return JSON with exactly these fields:
     # ─────────────────────────────────────────────────────────────────────────
     # ROW 6 — DECISION RATIONALE
     # ─────────────────────────────────────────────────────────────────────────
-    st.markdown("### 📋 Decision Rationale")
+    svg_header("REPORT", "Decision Rationale", level=3)
     if decision_rationale:
         for i, point in enumerate(decision_rationale, 1):
             st.markdown(
@@ -484,7 +485,7 @@ Return JSON with exactly these fields:
     # ─────────────────────────────────────────────────────────────────────────
     # ROW 7 — INDIA-SPECIFIC CONCERNS  (NEW)
     # ─────────────────────────────────────────────────────────────────────────
-    st.markdown("### 🇮🇳 India-Specific Concerns")
+    svg_header("TRIANGULATION", "India-Specific Concerns", level=3)
     if india_concerns:
         for concern in india_concerns:
             st.markdown(
@@ -492,10 +493,10 @@ Return JSON with exactly these fields:
                 unsafe_allow_html=True,
             )
     else:
-        st.success("No India-specific concerns flagged by the AI assessment.")
+        st.success("No India-specific concerns flagged by the AI assessment.", icon=":material/check_circle:")
 
     # ── Extra India indicators panel ─────────────────────────────────────────
-    with st.expander("📊 India Risk Indicator Details", expanded=False):
+    with st.expander("India Risk Indicator Details", expanded=False):
         i1, i2, i3 = st.columns(3)
         i1.metric("CIBIL Commercial Score", f"{cibil_score}/10" if cibil_score != "N/A" else "N/A")
         i2.metric("GST 2A/3B Variance",     f"{gst_variance:.1f}%")
@@ -508,14 +509,14 @@ Return JSON with exactly these fields:
     # ROW 8 — CONDITIONS / REJECTION REASON
     # ─────────────────────────────────────────────────────────────────────────
     if decision == "APPROVE" and conditions:
-        st.markdown("### ✅ Conditions for Approval")
+        svg_header("CHECK", "Conditions for Approval", level=3)
         for i, cond in enumerate(conditions, 1):
             st.markdown(f"**{i}.** {cond}")
     elif decision == "REJECT" and rejection_reason:
-        st.markdown("### 🚫 Rejection Reason")
+        svg_header("ERROR", "Rejection Reason", level=3)
         st.error(rejection_reason)
     elif decision == "MANUAL_REVIEW":
-        st.markdown("### 🔎 Manual Review Required")
+        svg_header("SEARCH", "Manual Review Required", level=3)
         st.warning(
             "This case requires senior credit officer review due to elevated risk indicators. "
             "Review all fraud flags and triangulation conflicts before proceeding."
@@ -527,7 +528,7 @@ Return JSON with exactly these fields:
 
     # ── Early Warning Signals ─────────────────────────────────────────────────
     if ewi_list:
-        with st.expander(f"⚡ Early Warning Signals ({len(ewi_list)} detected)", expanded=False):
+        with st.expander(f"Early Warning Signals ({len(ewi_list)} detected)", expanded=False):
             for ew in ewi_list:
                 if isinstance(ew, dict):
                     st.warning(f"**{ew.get('signal', ew.get('flag', 'EWS'))}** — {ew.get('detail', str(ew))}")
@@ -807,7 +808,7 @@ with tab2:
             icon = "🔴" if sev == "CRITICAL" else "🟡" if sev == "HIGH" else "🔵"
             st.markdown(
                 f"""<div class='{css_cls}'>
-                    <div style='font-weight:700;font-size:0.9rem'>{icon} {flag}
+                    <div style='font-weight:700;font-size:0.9rem'>{flag}
                         <span style='float:right;background:#e5e7eb;border-radius:4px;
                         padding:1px 6px;font-size:0.75rem;font-weight:600'>{sev}</span>
                     </div>
@@ -818,12 +819,12 @@ with tab2:
                 unsafe_allow_html=True,
             )
     else:
-        st.success("✅ No document-vs-web triangulation conflicts detected.")
+        st.success("No document-vs-web triangulation conflicts detected.", icon=":material/check_circle:")
 
     # ─────────────────────────────────────────────────────────────────────────
     # PANEL 6 — FULL FRAUD FLAGS TABLE
     # ─────────────────────────────────────────────────────────────────────────
-    st.markdown("### 📋 Complete Fraud Flags Register")
+    svg_header("REPORT", "Complete Fraud Flags Register", level=3)
     if all_flags:
         import pandas as _pd2
         rows = []
@@ -859,7 +860,7 @@ with tab2:
             hide_index=True,
         )
     else:
-        st.success("✅ No fraud flags registered.")
+        st.success("No fraud flags registered.", icon=":material/check_circle:")
 
     # ── Footer ───────────────────────────────────────────────────────────────
     st.divider()

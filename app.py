@@ -8,13 +8,14 @@ import os
 from datetime import datetime
 
 import streamlit as st
+from utils.ui_icons import svg_header, get_svg, icon_label
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE CONFIG
 # ─────────────────────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Intelli-Credit",
-    page_icon="🏦",
+    page_icon=":material/account_balance:",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -119,7 +120,7 @@ header { visibility: hidden; }
 # ─────────────────────────────────────────────────────────────────────────────
 DEMO_SCENARIOS = {
 
-    "🟢 ABC Manufacturing — APPROVE (Clean Profile)": {
+    "ABC Manufacturing — APPROVE (Clean Profile)": {
         "extraction_payload": {
             "entity_context": {
                 "company_name": "ABC Manufacturing Pvt Ltd",
@@ -234,7 +235,7 @@ DEMO_SCENARIOS = {
         },
     },
 
-    "🟡 XYZ Traders — MANUAL REVIEW (GST Mismatch + Moderate Risk)": {
+    "XYZ Traders — MANUAL REVIEW (GST Mismatch + Moderate Risk)": {
         "extraction_payload": {
             "entity_context": {
                 "company_name": "XYZ Traders Pvt Ltd",
@@ -372,7 +373,7 @@ DEMO_SCENARIOS = {
         },
     },
 
-    "🔴 PQR Real Estate — REJECT (Litigation + Low Cashflow)": {
+    "PQR Real Estate — REJECT (Litigation + Low Cashflow)": {
         "extraction_payload": {
             "entity_context": {
                 "company_name": "PQR Real Estate Dev Ltd",
@@ -541,11 +542,6 @@ DEMO_SCENARIOS = {
 os.makedirs("data", exist_ok=True)
 
 
-def _step_status(payload_key: str) -> str:
-    """Returns emoji status for a step based on session state."""
-    return "✅" if payload_key in st.session_state else "⬜"
-
-
 def _load_payload_silent(name: str, filepath: str) -> bool:
     """Silently loads a payload from file into session state if not present."""
     if name not in st.session_state:
@@ -571,26 +567,20 @@ for _pname, _fpath in [
 # SIDEBAR
 # ─────────────────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("""
+    st.markdown(f"""
     <div style='text-align:center;padding:1rem 0 0.5rem'>
-        <span style='font-size:2rem'>🏦</span><br>
+        <div style='display:flex;justify-content:center;margin-bottom:0.5rem'>{get_svg("BANK", size=48, color="#1B3A6B")}</div>
         <span style='font-size:1.3rem;font-weight:800;color:#1B3A6B'>Intelli-Credit</span><br>
         <span style='font-size:0.72rem;color:#64748b'>AI-Powered Credit Underwriting</span>
     </div>
     """, unsafe_allow_html=True)
     st.divider()
 
-    # ── Step progress (Clickable Navigation) ─────────────────────────────────
-    s1 = _step_status("extraction_payload")
-    s2 = _step_status("research_payload")
-    s3 = _step_status("recommendation_payload")
-    s4 = "✅" if os.path.exists("./data/cam_audit_log.json") else "⬜"
-
     st.markdown("**Pipeline Navigation**")
-    st.page_link("pages/01_ingestor.py",       label=f"{s1} Step 1 — Entity & Docs")
-    st.page_link("pages/02_research.py",       label=f"{s2} Step 2 — Research")
-    st.page_link("pages/03_recommendation.py", label=f"{s3} Step 3 — Risk Engine")
-    st.page_link("pages/04_cam.py",            label=f"{s4} Step 4 — CAM Report")
+    st.page_link("pages/01_ingestor.py",       label="Step 1 — Entity & Docs", icon=":material/snippet_folder:")
+    st.page_link("pages/02_research.py",       label="Step 2 — Research", icon=":material/search:")
+    st.page_link("pages/03_recommendation.py", label="Step 3 — Risk Engine", icon=":material/fact_check:")
+    st.page_link("pages/04_cam.py",            label="Step 4 — CAM Report", icon=":material/description:")
     
     st.divider()
 
@@ -612,7 +602,7 @@ with st.sidebar:
     ext = st.session_state.get("extraction_payload", {})
     company = (ext.get("entity_context") or {}).get("company_name", "")
     if company:
-        st.markdown(f"🏢 **{company}**")
+        st.markdown(f"{icon_label('BANK', company)}", unsafe_allow_html=True)
         st.divider()
 
     # ── CAM Version Display ───────────────────────────────────────────────────
@@ -625,7 +615,7 @@ with st.sidebar:
                 f"📄 **CAM Version:** {last['version']}  \n"
                 f"🕐 {last['timestamp'][:16].replace('T', ' ')}"
             )
-            if st.button("📋 View Version History"):
+            if st.button("View Version History", icon=":material/history"):
                 st.session_state["show_version_history"] = True
     except (FileNotFoundError, json.JSONDecodeError, KeyError):
         pass
@@ -642,15 +632,15 @@ with st.sidebar:
 # ─────────────────────────────────────────────────────────────────────────────
 # LANDING PAGE
 # ─────────────────────────────────────────────────────────────────────────────
-st.markdown("""
-<div class='hero-title'>🏦 Intelli-Credit</div>
-<div class='hero-tag'>AI-Powered Corporate Credit Underwriting.<br>From Raw PDF to CAM in Minutes.</div>
+svg_header("BANK", "Intelli-Credit", level=1, size=48)
+st.markdown("<div class='hero-tag'>AI-Powered Corporate Credit Underwriting.<br>From Raw PDF to CAM in Minutes.</div>", unsafe_allow_html=True)
+st.markdown(f"""
 <div style='margin:1rem 0'>
-    <span class='hero-badge'>🤖 Gemini 2.0 Flash</span>
-    <span class='hero-badge'>📄 Docling PDF Parsing</span>
-    <span class='hero-badge'>🔬 Fraud Triangulation</span>
-    <span class='hero-badge'>📊 Altman Z-Score</span>
-    <span class='hero-badge'>📝 CAM PDF Export</span>
+    <span class='hero-badge'>{icon_label("FLASH", "Gemini 2.0 Flash", size=14)}</span>
+    <span class='hero-badge'>{icon_label("REPORT", "Docling PDF Parsing", size=14)}</span>
+    <span class='hero-badge'>{icon_label("TRIANGULATION", "Fraud Triangulation", size=14)}</span>
+    <span class='hero-badge'>{icon_label("CHART", "Altman Z-Score", size=14)}</span>
+    <span class='hero-badge'>{icon_label("EDIT", "CAM PDF Export", size=14)}</span>
 </div>
 """, unsafe_allow_html=True)
 
@@ -659,7 +649,7 @@ col_cta, col_demo = st.columns([1, 2])
 with col_cta:
     st.markdown("""
     <div class='ic-card'>
-        <h3 style='color:#1B3A6B;margin-top:0'>🚀 Start New Application</h3>
+        <h3 style='color:#1B3A6B;margin-top:0'>Start New Application</h3>
         <p style='color:#475569;font-size:0.9rem'>
             Upload financial documents and run the full 4-module underwriting pipeline.
         </p>
@@ -671,7 +661,7 @@ with col_cta:
 with col_demo:
     st.markdown("""
     <div class='ic-card'>
-        <h3 style='color:#1B3A6B;margin-top:0'>🎯 Load Demo Scenario</h3>
+        <h3 style='color:#1B3A6B;margin-top:0'>Load Demo Scenario</h3>
         <p style='color:#475569;font-size:0.9rem'>
             Instantly load a pre-built borrower profile to explore the full pipeline output.
         </p>
@@ -684,7 +674,7 @@ with col_demo:
         label_visibility="collapsed",
     )
 
-    if st.button("⚡ Load Demo Data", use_container_width=True):
+    if st.button("Load Demo Data", icon=":material/flash_on:", use_container_width=True):
         scenario = DEMO_SCENARIOS[selected_scenario]
         st.session_state["extraction_payload"]     = scenario["extraction_payload"]
         st.session_state["research_payload"]       = scenario["research_payload"]
@@ -699,17 +689,17 @@ with col_demo:
             with open(f"./data/{fname}", "w") as wf:
                 json.dump(scenario[key], wf, indent=2, default=str)
 
-        st.success(f"✅ Demo loaded: **{selected_scenario.split(' — ')[0]}**")
+        st.success(f"Demo loaded: **{selected_scenario.split(' — ')[0]}**", icon=":material/check_circle:")
         st.rerun()
 
 # ── Scenario preview cards ────────────────────────────────────────────────────
-st.markdown("### 📋 Available Demo Scenarios")
+st.markdown("### Available Demo Scenarios")
 sc1, sc2, sc3 = st.columns(3)
 
 with sc1:
     st.markdown("""
     <div class='scenario-approve'>
-        <b>🟢 ABC Manufacturing Pvt Ltd</b><br>
+        <b>ABC Manufacturing Pvt Ltd</b><br>
         <span style='font-size:0.8rem;color:#065f46'>
         Sector: Manufacturing | ₹20Cr Term Loan<br>
         Z-Score: 2.74 | PD: 18% | CIBIL: 8/10<br>
@@ -721,7 +711,7 @@ with sc1:
 with sc2:
     st.markdown("""
     <div class='scenario-review'>
-        <b>🟡 XYZ Traders Pvt Ltd</b><br>
+        <b>XYZ Traders Pvt Ltd</b><br>
         <span style='font-size:0.8rem;color:#92400e'>
         Sector: Trading | ₹25Cr Working Capital<br>
         Z-Score: 1.95 | PD: 38% | CIBIL: 5/10<br>
@@ -731,9 +721,9 @@ with sc2:
     """, unsafe_allow_html=True)
 
 with sc3:
-    st.markdown("""
+    st.markdown(f"""
     <div class='scenario-reject'>
-        <b>🔴 PQR Real Estate Dev Ltd</b><br>
+        <b>PQR Real Estate Dev Ltd</b><br>
         <span style='font-size:0.8rem;color:#7f1d1d'>
         Sector: Real Estate | ₹40Cr Term Loan<br>
         Z-Score: 1.12 | PD: 72% | CIBIL: 2/10<br>
@@ -744,17 +734,17 @@ with sc3:
 
 # ── Pipeline overview ─────────────────────────────────────────────────────────
 st.divider()
-st.markdown("### 🔄 Pipeline Architecture")
+st.markdown("### Pipeline Architecture")
 p1, p2, p3, p4 = st.columns(4)
-for col, icon, title, desc in [
-    (p1, "📥", "Module 1\nIngestor",     "Entity onboarding, document upload, AI classification, extraction & fraud detection"),
-    (p2, "🔍", "Module 2\nResearch",     "OSINT research, web scraping, sector analysis & triangulation vs documents"),
-    (p3, "📊", "Module 3\nRisk Engine",  "Altman Z-Score, PD, LGD, max loan sizing, interest rate & fraud dashboard"),
-    (p4, "📝", "Module 4\nCAM Report",   "Multi-agent AI CAM generation, HITL review, PDF/Word export & versioning"),
+for col, icon_name, title, desc in [
+    (p1, "FOLDER", "Module 1\nIngestor",     "Entity onboarding, document upload, AI classification, extraction & fraud detection"),
+    (p2, "SEARCH", "Module 2\nResearch",     "OSINT research, web scraping, sector analysis & triangulation vs documents"),
+    (p3, "CHART",  "Module 3\nRisk Engine",  "Altman Z-Score, PD, LGD, max loan sizing, interest rate & fraud dashboard"),
+    (p4, "REPORT", "Module 4\nCAM Report",   "Multi-agent AI CAM generation, HITL review, PDF/Word export & versioning"),
 ]:
     col.markdown(
         f"<div class='ic-card' style='text-align:center'>"
-        f"<div style='font-size:2rem'>{icon}</div>"
+        f"<div style='display:flex;justify-content:center;margin-bottom:0.5rem'>{get_svg(icon_name, size=40, color='#1B3A6B')}</div>"
         f"<div style='font-weight:700;color:#1B3A6B;white-space:pre-line;font-size:0.9rem'>{title}</div>"
         f"<div style='font-size:0.78rem;color:#64748b;margin-top:4px'>{desc}</div>"
         f"</div>",

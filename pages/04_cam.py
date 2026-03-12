@@ -12,6 +12,7 @@ import pandas as pd
 import streamlit as st
 
 from utils.gemini_client import call_gemini_with_retry
+from utils.ui_icons import svg_header, get_svg, icon_label
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(page_title="Module 4 — CAM Generator", layout="wide")
@@ -44,7 +45,7 @@ def load_payload(name: str, filepath: str, required_step: int):
             st.info(f"Session restored from {filepath}")
         except FileNotFoundError:
             _page_map = {1: "pages/01_ingestor.py", 2: "pages/02_research.py", 3: "pages/03_recommendation.py"}
-            st.warning(f"⚠ {name} not found. Please complete Step {required_step} first.")
+            st.warning(f"{name} not found. Please complete Step {required_step} first.", icon=":material/warning:")
             if st.button(f"← Go to Step {required_step}"):
                 st.switch_page(_page_map[required_step])
             st.stop()
@@ -53,9 +54,12 @@ load_payload("extraction_payload",     "./data/extraction_payload.json",     1)
 load_payload("research_payload",       "./data/research_payload.json",       2)
 load_payload("recommendation_payload", "./data/recommendation_payload.json", 3)
 
-EP  = st.session_state["extraction_payload"]
-RP  = st.session_state["research_payload"]
-REC = st.session_state["recommendation_payload"]
+extraction_payload = st.session_state["extraction_payload"]
+research_payload   = st.session_state["research_payload"]
+recommendation_payload = st.session_state["recommendation_payload"]
+EP = extraction_payload # keep for back compat if missed anywhere
+RP = research_payload
+REC = recommendation_payload
 
 entity     = EP.get("entity_context", {}) or {}
 financials = EP.get("financials", {})      or {}
@@ -79,7 +83,7 @@ confidence   = REC.get("confidence", 0)
 india_concerns = REC.get("india_specific_concerns", []) or []
 
 # ── Page header ───────────────────────────────────────────────────────────────
-st.title("📝 Module 4 — Credit Appraisal Memo")
+svg_header("REPORT", "Module 4 — Credit Appraisal Memo", level=1)
 st.caption(f"**{company_name}** | {sector} | Loan: ₹{loan_amount:.0f}Cr | Decision: **{decision}**")
 
 # ── Step progress bar ─────────────────────────────────────────────────────────
@@ -107,9 +111,9 @@ REQUIRED_FIELDS = [
 missing = [name for name, val in REQUIRED_FIELDS if not val and val != 0]
 section_confidence_penalty = len(missing) * 0.15
 if missing:
-    with st.expander(f"⚠ {len(missing)} missing fields — some sections will have lower confidence"):
+    with st.expander(f"{len(missing)} missing fields — some sections will have lower confidence"):
         for m in missing:
-            st.warning(f"Missing: `{m}` — analyst review required")
+            st.warning(f"Missing: `{m}` — analyst review required", icon=":material/warning:")
 
 # ── STEP 2: Multi-agent Gemini CAM generation ─────────────────────────────────
 CAM_SECTIONS = [
@@ -227,7 +231,7 @@ The legal_risks section MUST explicitly address:
 """
 
 if "cam_json" not in st.session_state:
-    with st.spinner("🤖 Multi-agent AI generating 12 CAM sections..."):
+    with st.spinner("Multi-agent AI generating 12 CAM sections..."):
         try:
             raw = call_gemini_with_retry([build_cam_prompt()], response_mime_type="application/json")
             st.session_state["cam_json"] = json.loads(raw)
@@ -265,7 +269,7 @@ def score_section(section: str) -> float:
 confidence_scores = {s: score_section(s) for s in CAM_SECTIONS}
 
 # ── STEP 4: HITL Review interface ─────────────────────────────────────────────
-st.markdown("## ✍️ Review & Edit CAM Sections")
+svg_header("EDIT", "Review & Edit CAM Sections", level=2)
 st.caption("Each section is AI-generated. Edit as needed — changes are tracked for the audit log.")
 
 web_context = research_payload.get("web_context_used", {})
@@ -293,16 +297,17 @@ SECTION_LABELS = {
 
 for section in CAM_SECTIONS:
     sc = confidence_scores[section]
-    conf_label = "🟢 High confidence" if sc > 0.80 else ("🟡 Medium — review recommended" if sc > 0.60 else "🔴 Low — manual input required")
+    conf_label = "High confidence" if sc > 0.80 else ("Medium — review recommended" if sc > 0.60 else "Low — manual input required")
+    conf_icon = ":material/check_circle:" if sc > 0.80 else (":material/warning:" if sc > 0.60 else ":material/error:")
     label = SECTION_LABELS.get(section, section.replace("_", " ").title())
 
     with st.expander(f"{label}  [{sc:.0%} confidence]"):
         if sc > 0.80:
-            st.success(conf_label)
+            st.success(conf_label, icon=conf_icon)
         elif sc > 0.60:
-            st.warning(conf_label)
+            st.warning(conf_label, icon=conf_icon)
         else:
-            st.error(conf_label)
+            st.error(conf_label, icon=conf_icon)
 
         original_text = cam_json.get(section, "")
         edited = st.text_area(
@@ -317,7 +322,7 @@ for section in CAM_SECTIONS:
         st.session_state[f"cam_approved_{section}"]  = edited
         st.session_state[f"cam_changed_{section}"]   = changed
         if changed:
-            st.info("✏ Modified by analyst")
+            st.info("Modified by analyst", icon=":material/edit:")
 
 # ── STEP 5: Financial table + chart ──────────────────────────────────────────
 rev   = float(financials.get("revenue_cr")            or 0)
@@ -411,10 +416,10 @@ def generate_chart() -> str:
     plt.close(fig)
     return path
 
-st.markdown("## 📊 Financial Summary (Deterministic)")
+svg_header("CHART", "Financial Summary (Deterministic)", level=2)
 st.dataframe(financial_table, use_container_width=True, hide_index=True)
 
-with st.expander("🔍 Data Lineage — Extraction Audit Trail", expanded=False):
+with st.expander("Data Lineage — Extraction Audit Trail", expanded=False):
     lineage_data = extraction_payload.get("data_lineage", {})
     lineage_rows = []
     for k, v in list(lineage_data.items())[:20]:
@@ -427,7 +432,7 @@ with st.expander("🔍 Data Lineage — Extraction Audit Trail", expanded=False)
 
 # ── STEP 6 & 7: Generate PDFs + Word on button click ─────────────────────────
 st.divider()
-st.markdown("## 📥 Export Credit Appraisal Memo")
+svg_header("FOLDER", "Export Credit Appraisal Memo", level=2)
 
 approved_sections = {s: st.session_state.get(f"cam_approved_{s}", cam_json.get(s, "")) for s in CAM_SECTIONS}
 
@@ -824,7 +829,7 @@ def build_word() -> bytes:
 
 # ── Approve All & generate button ─────────────────────────────────────────────
 st.divider()
-if st.button("✅ Approve All & Generate CAM", use_container_width=True):
+if st.button("Approve All & Generate CAM", icon=":material/check_circle:", type="primary", use_container_width=True):
     chart_path = generate_chart()
     today_str  = date.today().strftime("%Y%m%d")
     pdf_fname  = f"CAM_{company_name.replace(' ', '_')}_{today_str}.pdf"
@@ -882,21 +887,23 @@ if st.button("✅ Approve All & Generate CAM", use_container_width=True):
     with open("./data/cam_audit_log.json", "w") as al:
         json.dump(audit_log, al, indent=2, default=str)
 
-    st.success(f"✅ CAM {version} generated for **{company_name}**")
+    st.success(f"CAM {version} generated for **{company_name}**", icon=":material/verified:")
 
     # ── Download buttons ───────────────────────────────────────────────────
     col1, col2 = st.columns(2)
     with col1:
         if pdf_bytes:
             st.download_button(
-                "⬇ Download CAM (PDF)", data=pdf_bytes,
+                "Download CAM (PDF)", data=pdf_bytes,
+                icon=":material/download:",
                 file_name=pdf_fname, mime="application/pdf",
                 use_container_width=True,
             )
     with col2:
         if word_bytes:
             st.download_button(
-                "⬇ Download CAM (Word)", data=word_bytes,
+                "Download CAM (Word)", data=word_bytes,
+                icon=":material/download:",
                 file_name=word_fname,
                 mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 use_container_width=True,
@@ -904,7 +911,7 @@ if st.button("✅ Approve All & Generate CAM", use_container_width=True):
 
 # ── STEP 8: Version history UI ────────────────────────────────────────────────
 st.divider()
-st.subheader("📋 CAM Version History")
+svg_header("REPORT", "CAM Version History", level=3)
 try:
     with open("./data/cam_audit_log.json") as al:
         audit_log = json.load(al)
@@ -936,4 +943,4 @@ with n1:
     if st.button("← Back to Module 3"):
         st.switch_page("pages/03_recommendation.py")
 with n2:
-    st.success("✅ You have completed all 4 modules of Intelli-Credit.")
+    st.success("You have completed all 4 modules of Intelli-Credit.", icon=":material/task_alt:")

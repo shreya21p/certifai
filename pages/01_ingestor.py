@@ -13,6 +13,7 @@ from utils.gemini_client import call_gemini_with_retry
 from utils.docling_parser import parse_document
 from utils.schema_editor import render_schema_editor
 from utils.fraud_engine import detect_revenue_anomalies
+from utils.ui_icons import svg_header, get_svg, icon_label
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(page_title="Module 1 — Ingestor", layout="wide")
@@ -72,7 +73,7 @@ steps_done = sum([
     "research_payload"   in st.session_state,
     "recommendation_payload" in st.session_state,
 ])
-st.title("📂 Module 1 — Ingestor & Data Extractor")
+svg_header("FOLDER", "Module 1 — Ingestor & Data Extractor", level=1)
 st.progress(steps_done / 4, text=f"Pipeline: {steps_done}/4 modules complete")
 st.divider()
 
@@ -208,7 +209,7 @@ confidence must be a float between 0 and 1
         is_quota = "429" in err_str or "RESOURCE_EXHAUSTED" in err_str or "quota" in err_str.lower()
         is_key_err = "400" in err_str or "403" in err_str or "expired" in err_str.lower() or "leaked" in err_str.lower()
         if is_quota or is_key_err:
-            st.warning(f"⚠️ API unavailable for **{filename}** — using filename-based classification instead.")
+            st.warning(f"API unavailable for **{filename}** — using filename-based classification instead.", icon=":material/warning:")
             return classify_by_filename(filename)
         st.error(f"Classification error for {filename}: {e}")
         return {"filename": filename, "detected_type": "Unknown", "confidence": 0.0, "reasoning": str(e)}
@@ -236,7 +237,7 @@ def render_step_2():
                     time.sleep(5)
             progress.progress((i + 1) / total)
         
-        status.success("Classification complete!")
+        status.success("Classification complete!", icon=":material/check_circle:")
     
     if st.session_state["classification_results"]:
         st.subheader("Classification Results")
@@ -290,11 +291,66 @@ def render_step_3():
         st.session_state["step"] = 2
         st.rerun()
 
-def build_schema_prompt(config):
-    fields_list = []
-    for r in config:
-        fields_list.append(f" - {r['Field Key']}: {r['Display Label']} (Unit: {r['Unit']})")
-    return "\n".join(fields_list)
+FIELD_ALIASES = {
+    "revenue_cr":                ["Revenue from Operations", "Total Revenue", "Net Sales",
+                                   "Revenue from operations", "Turnover", "Sales"],
+    "ebitda_cr":                 ["EBITDA", "Operating Profit", "Earnings before interest"],
+    "pat_cr":                    ["PAT", "Profit After Tax", "Net Profit", "Total Comprehensive Income"],
+    "total_debt_cr":             ["Total Debt", "Total Borrowings", "Total Outstanding"],
+    "total_assets_cr":           ["Total Assets", "TOTAL ASSETS", "Total Application"],
+    "net_worth_cr":              ["Net Worth", "Total Equity", "Shareholders Equity",
+                                   "TOTAL EQUITY", "Equity + Reserves"],
+    "operating_cashflow_cr":     ["Net Cash from Operations", "Cash from Operating Activities",
+                                   "NET CASH FROM OPERATIONS"],
+    "promoter_holding_pct":      ["Promoter Holding", "Promoter %", "% Holding promoter",
+                                   "Sub-total Promoters %"],
+    "promoter_pledge_pct":       ["Pledge %", "Pledged %", "% Pledged", "Pledge as % of Total Equity"],
+    "npa_pct":                   ["Gross NPA %", "NPA %", "GNPA %", "Gross NPA"],
+    "net_npa_pct":               ["Net NPA %", "NNPA %", "Net NPA"],
+    "par_30_pct":                ["PAR > 30", "PAR 30", "Portfolio at Risk 30 days",
+                                   "PAR > 30 Days %"],
+    "par_90_pct":                ["PAR > 90", "PAR 90", "Portfolio at Risk 90 days",
+                                   "PAR > 90 Days %"],
+    "collection_efficiency_pct": ["Collection Efficiency", "Collection %", "CE %"],
+    "provision_coverage_ratio_pct": ["Provision Coverage", "PCR", "Provision Coverage Ratio %"],
+    "credit_cost_pct":           ["Credit Cost", "Credit Cost %"],
+    "vintage_30dpd_pct":         ["Vintage 30 DPD", "30-DPD", "30DPD vintage"],
+    "vintage_90dpd_pct":         ["Vintage 90 DPD", "90-DPD", "90DPD vintage"],
+    "avg_monthly_bank_inflow_cr": ["Average Monthly Inflow", "Monthly Bank Inflow",
+                                    "Monthly inflow", "Bank Inflow (monthly)"],
+    "avg_monthly_bank_outflow_cr": ["Average Monthly Outflow", "Monthly Bank Outflow"],
+    "gst_declared_sales_cr":     ["GST Sales", "GSTR Sales", "Declared Sales (GST)",
+                                   "GST-implied sales"],
+    "gst_2a_input_credit_cr":    ["GSTR-2A", "2A Input Credit", "Input Tax Credit"],
+    "gst_3b_output_tax_cr":      ["GSTR-3B", "3B Output Tax", "Output Tax"],
+    "gst_2a_vs_3b_variance_pct": ["GSTR variance", "2A vs 3B", "GST mismatch %"],
+    "liquidity_gap_cr":          ["Liquidity Gap", "Gap (A-B)", "Net Gap"],
+    "secured_debt_cr":           ["Secured Debt", "Secured Term Loans", "Secured Borrowings"],
+    "unsecured_debt_cr":         ["Unsecured Debt", "Unsecured Borrowings", "Director Loan"],
+    "debt_to_equity_ratio":      ["D/E Ratio", "Debt to Equity", "Leverage Ratio"],
+}
+
+def get_aliases(field_key: str) -> str:
+    aliases = FIELD_ALIASES.get(field_key, [field_key])
+    return " / ".join(aliases)
+
+DOC_TYPE_FIELDS = {
+    "AnnualReport":        ["revenue_cr","ebitda_cr","pat_cr","total_debt_cr",
+                            "total_assets_cr","net_worth_cr","operating_cashflow_cr",
+                            "debt_to_equity_ratio"],
+    "ALM":                 ["liquidity_gap_cr","total_outflows_cr","short_term_liabilities_cr"],
+    "ShareholdingPattern": ["promoter_holding_pct","promoter_pledge_pct","institutional_holding_pct"],
+    "BorrowingProfile":    ["secured_debt_cr","unsecured_debt_cr","average_interest_rate",
+                            "avg_monthly_bank_inflow_cr","avg_monthly_bank_outflow_cr"],
+    "PortfolioPerformance":["npa_pct","net_npa_pct","par_30_pct","par_90_pct",
+                            "collection_efficiency_pct","provision_coverage_ratio_pct",
+                            "credit_cost_pct","vintage_30dpd_pct","vintage_90dpd_pct",
+                            "disbursement_cr","gross_npa_cr"],
+    "GSTReturn":           ["gst_declared_sales_cr","gst_2a_input_credit_cr",
+                            "gst_3b_output_tax_cr","gst_2a_vs_3b_variance_pct",
+                            "gst_filing_regularity"],
+    "BankStatement":       ["avg_monthly_bank_inflow_cr","avg_monthly_bank_outflow_cr"],
+}
 
 def extract_file_data(file_info, schema_config):
     filename = file_info["filename"]
@@ -303,24 +359,42 @@ def extract_file_data(file_info, schema_config):
     if not file_bytes:
         return {}
         
-    enabled_fields = build_schema_prompt(schema_config)
+    # Filter schema_config to only include relevant fields for this document type
+    allowed_keys = DOC_TYPE_FIELDS.get(doc_type)
+    if allowed_keys:
+        relevant_fields = [f for f in schema_config if f["Field Key"] in allowed_keys]
+    else:
+        relevant_fields = schema_config # fallback to all if Unknown or not mapped
+        
+    fields_list_str = "\n".join([
+        f'- {field["Field Key"]}: also labeled as {get_aliases(field["Field Key"])} | unit: {field.get("Unit","number")} | return null if not found'
+        for field in relevant_fields
+    ])
     
-    system_prompt = f"""You are a senior financial analyst extracting data from Indian corporate financial documents.
-    Extract ALL of these specific fields:
-{enabled_fields}
+    system_prompt = f"""You are a financial data extraction expert. Extract values from the document below.
 
-    Convert all monetary values to ₹ Crores.
-    For EACH extracted field, also provide the source (document name + page/section) in data_lineage.
-    If a field is not found, set it to null.
-    List all null fields in missing_fields.
-    Return valid JSON only. The JSON should match this exact root structure:
-    {{
-        "extraction_confidence": float,
-        "missing_fields": [list of strings],
-        "source_documents": ["{filename}"],
-        "data_lineage": {{"field_key": "Doc: {filename}, Page/Section: ...", ...}},
-        ... and then include all the requested field keys at the root level.
-    }}"""
+DOCUMENT TYPE: {doc_type}
+
+FIELDS TO EXTRACT (try ALL aliases for each field):
+{fields_list_str}
+
+RULES:
+1. Return ONLY a JSON object, no markdown, no explanation
+2. Every enabled field key must appear in the output
+3. If a value is not found in this document, return null (not 0)
+4. For percentage fields, return the number only (e.g. 15.68 not "15.68%")
+5. For crore fields, ensure value is in crores (not lakhs or rupees)
+6. Include a "data_lineage" key mapping field_key to the exact cell/row where you found it
+7. List all null fields in "missing_fields". Include "extraction_confidence" float and "source_documents" list natively in the root.
+
+Return format:
+{{
+    "extraction_confidence": 0.95,
+    "missing_fields": ["ebitda_cr"],
+    "source_documents": ["{filename}"],
+    "revenue_cr": 85.50,
+    "data_lineage": {{"revenue_cr": "P&L sheet, row 3"}}
+}}"""
 
     if doc_type == "PortfolioPerformance":
         system_prompt += """\n\nThis is a Portfolio Performance / Cuts document. For this specific document:
@@ -438,15 +512,15 @@ def render_step_5():
         flags = detect_revenue_anomalies(final_ext, st.session_state["entity_context"])
         
         if not flags:
-            st.success("No fraud flags detected.")
+            st.success("No fraud flags detected.", icon=":material/check_circle:")
         else:
             for flag in flags:
                 if flag["severity"] == "CRITICAL":
-                    st.error(f"🚨 **{flag['flag']}** - {flag['detail']}")
+                    st.error(f"**{flag['flag']}** - {flag['detail']}", icon=":material/dangerous:")
                 elif flag["severity"] == "HIGH":
-                    st.warning(f"⚠️ **{flag['flag']}** - {flag['detail']}")
+                    st.warning(f"**{flag['flag']}** - {flag['detail']}", icon=":material/warning:")
                 elif flag["severity"] == "MEDIUM":
-                    st.info(f"ℹ️ **{flag['flag']}** - {flag['detail']}")
+                    st.info(f"**{flag['flag']}** - {flag['detail']}", icon=":material/info:")
                     
         # Portfolio Health gauges (if applicable)
         npa = final_ext.get("npa_pct")

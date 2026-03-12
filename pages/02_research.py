@@ -10,6 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.web_scraper import gather_web_context
 from utils.triangulation import triangulate_research_vs_documents
 from utils.research_agent import generate_research_report
+from utils.ui_icons import svg_header, get_svg, icon_label
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(page_title="Module 2 — Research Agent", layout="wide")
@@ -33,7 +34,7 @@ def load_payload(name: str, filepath: str, required_step: int):
                 st.session_state[name] = json.load(f)
             st.info(f"Session restored from {filepath}")
         except FileNotFoundError:
-            st.warning(f"⚠ {name} not found. Please complete Step {required_step} first.")
+            st.warning(f"{name} not found. Please complete Step {required_step} first.", icon=":material/warning:")
             if st.button(f"← Go to Step {required_step}"):
                 st.switch_page(f"pages/0{required_step}_{'ingestor' if required_step==1 else 'research'}.py")
             st.stop()
@@ -46,7 +47,7 @@ steps_done = sum([
     "research_payload"   in st.session_state,
     "recommendation_payload" in st.session_state,
 ])
-st.title("🔍 Module 2 — Research Agent")
+svg_header("SEARCH", "Module 2 — Research Agent", level=1)
 st.progress(steps_done / 4, text=f"Pipeline: {steps_done}/4 modules complete")
 st.divider()
 
@@ -130,7 +131,7 @@ if 'research_report' in st.session_state:
     
     # Row 0 — Triangulation Alerts
     if triangulation_flags:
-        st.error("⚡ TRIANGULATION ALERTS — Contradictions Detected")
+        st.error("TRIANGULATION ALERTS — Contradictions Detected", icon=":material/dangerous:")
         st.caption("These flags highlight contradictions between web intelligence and your uploaded documents. They require analyst resolution before proceeding.")
         for flag in triangulation_flags:
             st.warning(f"**[{flag['severity']}] {flag['flag']}**\n\n{flag['detail']}")
@@ -179,7 +180,7 @@ if 'research_report' in st.session_state:
     # Row 4 — India-Specific Flags
     st.subheader("India-Specific Findings")
     for fl in report.india_specific_flags:
-        st.info(f"📍 {fl}")
+        st.info(f"{fl}", icon=":material/info:")
     
     # STEP 6 — OUTPUT CONTRACT (CRITICAL)
     if st.button("Confirm Research & Proceed", type="primary"):
@@ -194,5 +195,5 @@ if 'research_report' in st.session_state:
         with open("./data/research_payload.json", "w") as f:
             json.dump(st.session_state["research_payload"], f, indent=4)
             
-        st.success("Research profile confirmed and saved. Proceeding to risk summary...")
+        st.success("Research profile confirmed and saved. Proceeding to risk summary...", icon=":material/check_circle:")
         st.switch_page("pages/03_recommendation.py")
