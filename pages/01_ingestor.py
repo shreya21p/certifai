@@ -15,6 +15,8 @@ from utils.docling_parser import parse_document
 from utils.schema_editor import render_schema_editor
 from utils.fraud_engine import detect_revenue_anomalies
 from utils.ui_icons import svg_header, get_svg, icon_label
+import pymupdf
+import io as _io
 
 # ── Page config ───────────────────────────────────────────────────────────────
 
@@ -33,7 +35,8 @@ h1,h2,h3,h4 { color: #1B3A6B; }
 class DocumentClassification(BaseModel):
     filename: str
     detected_type: Literal[
-        "ALM", "ShareholdingPattern", "BorrowingProfile", "AnnualReport", 
+        "AnnualReport", "FinancialStatements", "MCAFiling", "SustainabilityReport",
+        "ALM", "ShareholdingPattern", "BorrowingProfile",
         "PortfolioPerformance", "BankStatement", "GSTReturn", "Unknown"
     ]
     confidence: float
@@ -174,7 +177,18 @@ Respond with ONLY a valid JSON object. No explanation, no markdown, no code fenc
 Exactly this format:
 {{"detected_type": "ALM", "confidence": 0.95, "reasoning": "Contains maturity buckets and liquidity gap"}}
 
-detected_type must be one of: ALM, ShareholdingPattern, BorrowingProfile, AnnualReport, PortfolioPerformance, BankStatement, GSTReturn, Unknown
+detected_type must be one of:
+  AnnualReport         - Full annual report with directors report + financials
+  FinancialStatements  - Standalone P&L, Balance Sheet, Cash Flow only
+  MCAFiling            - MCA Form MGT-7 annual return, ROC filings, Form AOC-4
+  SustainabilityReport - ESG, CSR, climate, sustainability reports (NO financials)
+  ALM                  - Asset Liability Management statement
+  ShareholdingPattern  - Shareholding pattern, Form MGT-7 equity schedule
+  BorrowingProfile     - Loan schedule, debt summary, borrowing profile
+  PortfolioPerformance - Portfolio cuts, DPD buckets, collection efficiency
+  BankStatement        - Bank account statement
+  GSTReturn            - GSTR-1, GSTR-3B, GSTR-2A returns
+  Unknown              - Cannot determine
 confidence must be a float between 0 and 1
 """
 
@@ -187,11 +201,20 @@ confidence must be a float between 0 and 1
                 tf.write(file_bytes)
                 tf_path = tf.name
             try:
-                markdown_text = parse_document(tf_path)
-                preview_text = markdown_text[:2000]
+                parsed = parse_document(tf_path)
+                if parsed.get("metadata", {}).get("ocr"):
+                    # Scanned PDF — render page 1 thumbnail for vision
+                    doc = pymupdf.open(tf_path)
+                    pix = doc[0].get_pixmap(matrix=pymupdf.Matrix(1.5, 1.5))
+                    img_bytes = pix.tobytes("png")
+                    doc.close()
+                    img_data = {"mime_type": "image/png", "data": img_bytes}
+                    contents = [prompt, img_data]
+                else:
+                    preview_text = parsed.get("text", "")[:2000]
+                    contents = [prompt + "\n\nPreview: " + preview_text]
             finally:
                 os.remove(tf_path)
-            contents = [prompt + "\n\nPreview: " + preview_text]
         elif ext in ['.jpg', '.jpeg', '.png']:
             img_data = {
                 "mime_type": f"image/{ext[1:]}",
@@ -255,7 +278,11 @@ def render_step_2():
         
         if df_list:
             df = pd.DataFrame(df_list)
-            types = ["ALM", "ShareholdingPattern", "BorrowingProfile", "AnnualReport", "PortfolioPerformance", "BankStatement", "GSTReturn", "Unknown"]
+            types = [
+                "AnnualReport", "FinancialStatements", "MCAFiling", "SustainabilityReport",
+                "ALM", "ShareholdingPattern", "BorrowingProfile",
+                "PortfolioPerformance", "BankStatement", "GSTReturn", "Unknown",
+            ]
             edited_df = st.data_editor(
                 df,
                 column_config={
@@ -292,16 +319,53 @@ def render_step_3():
         st.rerun()
 
 FIELD_ALIASES = {
-    "revenue_cr":                ["Revenue from Operations", "Total Revenue", "Net Sales",
-                                   "Revenue from operations", "Turnover", "Sales"],
-    "ebitda_cr":                 ["EBITDA", "Operating Profit", "Earnings before interest"],
-    "pat_cr":                    ["PAT", "Profit After Tax", "Net Profit", "Total Comprehensive Income"],
-    "total_debt_cr":             ["Total Debt", "Total Borrowings", "Total Outstanding"],
-    "total_assets_cr":           ["Total Assets", "TOTAL ASSETS", "Total Application"],
-    "net_worth_cr":              ["Net Worth", "Total Equity", "Shareholders Equity",
-                                   "TOTAL EQUITY", "Equity + Reserves"],
-    "operating_cashflow_cr":     ["Net Cash from Operations", "Cash from Operating Activities",
-                                   "NET CASH FROM OPERATIONS"],
+    "revenue_cr": [
+        "Revenue from Operations", "Total Revenue from Operations",
+        "Total Income", "Net Interest Income", "Interest Income",
+        "Income from Operations", "Net Revenue", "Total Revenue",
+        "Revenue from operations", "Turnover", "Sales",
+    ],
+    "ebitda_cr": [
+        "EBITDA", "Operating Profit", "Earnings before interest",
+        "Pre-Provisioning Operating Profit", "PPOP",
+        "Operating Profit before Provisions",
+        "Profit Before Tax and Provisions",
+        "COMPUTE: Total Income minus Operating Expenses (exclude provisions and tax)",
+    ],
+    "pat_cr": [
+        "PAT", "Profit After Tax", "Net Profit",
+        "Profit for the Year", "Net Profit for the Year",
+        "Profit After Tax and Minority Interest",
+        "Total Comprehensive Income",
+    ],
+    "total_debt_cr": [
+        "Total Debt", "Total Borrowings", "Borrowings",
+        "Debt Securities", "Borrowings (other than Debt Securities)",
+        "Total Financial Liabilities", "Funds Borrowed",
+        "Total Outstanding", "Debt Securities + Borrowings",
+    ],
+    "total_assets_cr": [
+        "Total Assets", "TOTAL ASSETS", "Balance Sheet Total",
+        "Total of Assets", "Grand Total (Assets)", "Total Application",
+    ],
+    "net_worth_cr": [
+        "Net Worth", "Total Equity", "Shareholders Funds",
+        "Total Shareholders Equity", "Shareholders Equity",
+        "Equity Share Capital + Reserves", "Equity Attributable to Owners",
+        "TOTAL EQUITY", "Equity + Reserves",
+    ],
+    "operating_cashflow_cr": [
+        "Net Cash from Operations", "Cash from Operating Activities",
+        "NET CASH FROM OPERATIONS",
+        "Net Cash from Operating Activities",
+        "Net Cash Generated from Operations",
+        "Net Cash used in Operating Activities",
+    ],
+    "debt_to_equity_ratio": [
+        "D/E Ratio", "Debt to Equity", "Leverage Ratio",
+        "Debt/Equity", "Financial Leverage",
+        "COMPUTE: Total Borrowings / Total Equity",
+    ],
     "promoter_holding_pct":      ["Promoter Holding", "Promoter %", "% Holding promoter",
                                    "Sub-total Promoters %"],
     "promoter_pledge_pct":       ["Pledge %", "Pledged %", "% Pledged", "Pledge as % of Total Equity"],
@@ -327,7 +391,6 @@ FIELD_ALIASES = {
     "liquidity_gap_cr":          ["Liquidity Gap", "Gap (A-B)", "Net Gap"],
     "secured_debt_cr":           ["Secured Debt", "Secured Term Loans", "Secured Borrowings"],
     "unsecured_debt_cr":         ["Unsecured Debt", "Unsecured Borrowings", "Director Loan"],
-    "debt_to_equity_ratio":      ["D/E Ratio", "Debt to Equity", "Leverage Ratio"],
 }
 
 def get_aliases(field_key: str) -> str:
@@ -338,6 +401,15 @@ DOC_TYPE_FIELDS = {
     "AnnualReport":        ["revenue_cr","ebitda_cr","pat_cr","total_debt_cr",
                             "total_assets_cr","net_worth_cr","operating_cashflow_cr",
                             "debt_to_equity_ratio"],
+    "FinancialStatements": ["revenue_cr","ebitda_cr","pat_cr","total_debt_cr",
+                            "total_assets_cr","net_worth_cr","operating_cashflow_cr",
+                            "debt_to_equity_ratio"],
+    "MCAFiling":           [
+        "ecourt_cases_count",         # director disqualification flags
+        "mca_filing_date",
+        "promoter_holding_pct",       # sometimes in MGT-7
+    ],
+    "SustainabilityReport": [],       # extract nothing — no financial fields
     "ALM":                 ["liquidity_gap_cr","total_outflows_cr","short_term_liabilities_cr"],
     "ShareholdingPattern": ["promoter_holding_pct","promoter_pledge_pct","institutional_holding_pct"],
     "BorrowingProfile":    ["secured_debt_cr","unsecured_debt_cr","average_interest_rate",
@@ -400,6 +472,23 @@ Return format:
         system_prompt += """\n\nThis is a Portfolio Performance / Cuts document. For this specific document:
     Focus on: DPD buckets (0-30, 30-60, 60-90, 90+), PAR ratios, collection efficiency by vintage, geographic/product-wise NPA split, gross and net NPA amounts, provision coverage ratio, credit cost, disbursement trends. Extract vintage analysis if table is present."""
 
+    # ── NBFC / Financial Services sector — override extraction instructions ──
+    entity = st.session_state.get("entity_context", {})
+    if entity.get("sector") in ["NBFC", "Financial Services", "Banking"]:
+        nbfc_instruction = """
+IMPORTANT — THIS IS AN NBFC/FINANCIAL SERVICES COMPANY:
+- Revenue = Total Income (interest income + fee income + other income)
+- EBITDA = Pre-Provisioning Operating Profit (PPOP) if available,
+           else compute as: Total Income - Operating Expenses (before provisions)
+- Total Debt = Sum of ALL borrowing lines:
+               Debt Securities + Borrowings + Subordinated Debt + NCD
+- Net Worth = Total Equity = Share Capital + All Reserves & Surplus
+- Do NOT look for "Revenue from Operations" — NBFCs don't have this line
+- NPA %, PAR ratios, Collection Efficiency ARE likely present — extract them
+- Capital Adequacy Ratio (CRAR) — extract if found, map to a note field
+"""
+        system_prompt = nbfc_instruction + system_prompt
+
     ext = os.path.splitext(filename)[1].lower()
     
     try:
@@ -420,16 +509,41 @@ Return format:
             contents = [system_prompt, f"Data Summary for {filename}:\n" + df_summary]
             res_text = call_gemini_with_retry(contents, response_mime_type="application/json")
         else:
-            # Unstructured
+            # PDF or image — use two-path parser
             with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tf:
                 tf.write(file_bytes)
                 tf_path = tf.name
             try:
-                markdown_text = parse_document(tf_path)
+                parsed = parse_document(tf_path)
+                # Store for debug display
+                st.session_state.setdefault("parsed_documents_debug", {})[filename] = parsed
             finally:
                 os.remove(tf_path)
-                
-            contents = [system_prompt, f"Document Markdown ({filename}):\n\n" + markdown_text]
+
+            if parsed["parse_method"] == "gemini_vision" or parsed.get("metadata", {}).get("ocr"):
+                # Scanned/image — send as multimodal (vision) call
+                if parsed["parse_method"] == "gemini_vision":
+                    img_bytes = base64.b64decode(parsed["image_b64"])
+                    mime = "image/" + ext.lstrip(".")
+                else:
+                    # scanned PDF — re-render page 1 for extraction thumbnail
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tf2:
+                        tf2.write(file_bytes)
+                        tf2_path = tf2.name
+                    try:
+                        doc = pymupdf.open(tf2_path)
+                        pix = doc[0].get_pixmap(matrix=pymupdf.Matrix(2.0, 2.0))
+                        img_bytes = pix.tobytes("png")
+                        doc.close()
+                    finally:
+                        os.remove(tf2_path)
+                    mime = "image/png"
+                img_data = {"mime_type": mime, "data": img_bytes}
+                contents = [system_prompt, img_data]
+            else:
+                text_content = parsed.get("text", "")
+                contents = [system_prompt, f"Document Text ({filename}):\n\n{text_content}"]
+
             res_text = call_gemini_with_retry(contents, response_mime_type="application/json")
             
         return json.loads(res_text)
@@ -442,13 +556,30 @@ def render_step_4():
     
     if st.button("Run Extraction"):
         with st.spinner("Extracting data... This may take a minute."):
-            all_results = {}
+            # Store parsed text per file for debug display
+            st.session_state["parsed_documents_debug"] = {}
             for file_info in st.session_state["accepted_files"]:
                 st.write(f"Extracting from {file_info['filename']}...")
                 res = extract_file_data(file_info, st.session_state["schema_config"])
                 st.session_state["extraction_results"][file_info["filename"]] = res
 
     if st.session_state["extraction_results"]:
+        # ── DEBUG: show what text was actually sent to Gemini ──────────────────
+        parsed_debug = st.session_state.get("parsed_documents_debug", {})
+        if parsed_debug:
+            with st.expander("DEBUG — Raw parsed text sent to Gemini", expanded=False):
+                for fname, parsed in parsed_debug.items():
+                    st.markdown(f"**{fname}**")
+                    st.markdown(f"Parse method: `{parsed.get('parse_method')}`")
+                    st.markdown(f"Text length: `{len(parsed.get('text', ''))} chars`")
+                    st.text_area(
+                        label=f"First 3000 chars of {fname}",
+                        value=parsed.get("text", "")[:3000],
+                        height=200,
+                        key=f"debug_{fname}",
+                    )
+                    st.divider()
+
         st.subheader("Human-in-the-loop Extraction Review")
         
         # Merge results into a master payload

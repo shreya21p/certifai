@@ -1,0 +1,1 @@
+{"r": "{\n  \"extraction_confidence\": 0.95,\n  \"missing_fields\": [],\n  \"source_documents\": [\n    \"Annual Return FY 24-25.pdf\"\n  ],\n  \"promoter_holding_pct\": 31.23,\n  \"data_lineage\": {\n    \"promoter_holding_pct\": \"Page 10, Section VI SHARE HOLDING PATTERN, A Promoters, row Total, column Percentage (Equity)\"\n  }\n}"}

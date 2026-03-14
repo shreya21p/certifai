@@ -1,0 +1,1 @@
+{"r": "{\n    \"extraction_confidence\": 0.0,\n    \"missing_fields\": [\n        \"promoter_holding_pct\"\n    ],\n    \"source_documents\": [\n        \"Annual Return FY 23-24-Final-Sc.pdf\"\n    ],\n    \"promoter_holding_pct\": null,\n    \"data_lineage\": {\n        \"promoter_holding_pct\": null\n    }\n}"}
